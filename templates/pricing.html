@@ -145,7 +145,7 @@
    <div class="container">
     <div class="navbar-brand">
         <a class="navbar-item" href="#">
-          <img class="logo" src=" {% static 'logo.png'%}" alt="microsaalink">
+          <img class="logo" src=" {% static 'app/images/icon.png'%}" alt="microsaalink">
         </a>
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
           <span aria-hidden="true"></span>
@@ -197,7 +197,7 @@
                 <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 2 months</li>
               </ul>
             </div>
-            <button class="button is-primary is-rounded is-outlined is-fullwidth">Start Trial</button>
+            <a href=" {% url 'dashboard' %}" class="button is-primary is-rounded is-outlined is-fullwidth">Start Free Trial</a>
           </div>
         </div>
 
@@ -220,7 +220,7 @@
                 <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 6 months</li>
               </ul>
             </div>
-            <button class="button is-primary is-rounded is-fullwidth">Buy Now</button>
+            <a href=" {% url 'dashboard' %}" class="button is-primary is-rounded is-fullwidth">Buy Now</a>
           </div>
         </div>
         <!-- Starter Pack -->
@@ -240,7 +240,7 @@
                 <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 2 months</li>
               </ul>
             </div>
-            <button class="button is-primary is-rounded is-outlined is-fullwidth">Buy Now</button>
+            <a href=" {% url 'dashboard' %}"  class="button is-primary is-rounded is-outlined is-fullwidth">Buy Now</a>
           </div>
         </div>
 
@@ -281,32 +281,4 @@
 
 {% endblock content %}
 
-{% block scripts %}
-<script>
-  // Pricing toggle functionality
-document.addEventListener('DOMContentLoaded', () => {
-  const monthlyBtn = document.querySelector('.monthly-btn');
-  const annualBtn = document.querySelector('.annual-btn');
-  const prices = document.querySelectorAll('.pricing-amount .title');
-  
-  const monthlyPrices = ['$29', '$79', '$199'];
-  const annualPrices = ['$290', '$790', '$1,990'];
-  
-  monthlyBtn.addEventListener('click', () => {
-    monthlyBtn.classList.add('is-primary');
-    annualBtn.classList.remove('is-primary');
-    prices.forEach((price, index) => {
-      price.textContent = monthlyPrices[index];
-    });
-  });
-  
-  annualBtn.addEventListener('click', () => {
-    annualBtn.classList.add('is-primary');
-    monthlyBtn.classList.remove('is-primary');
-    prices.forEach((price, index) => {
-      price.textContent = annualPrices[index];
-    });
-  });
-});
-</script>
-{% endblock scripts %}
+{% block scripts %}{% endblock scripts %}
