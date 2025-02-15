@@ -1,0 +1,45 @@
+{% load static%}
+<nav class="navbar is-dark" role="navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <img class="logo" src=" {% static 'app/images/icon.png'%}" alt="microsaalink">
+        </a>
+    </div>
+
+    <div class="navbar-menu">
+        <div class="navbar-start">
+            <a class="navbar-item">
+                <i class="fas fa-history"></i>
+                History
+            </a>
+            <a class="navbar-item">
+                <i class="fas fa-chart-bar"></i>
+                Analytics
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="tags has-addons">
+                    <span class="tag is-info">
+                        <i class="fas fa-coins"></i>
+                    </span>
+                    <span class="tag is-dark" id="token-counter">
+                        {{ request.user.profile.remaining_tokens }}
+                    </span>
+                </div>
+            </div>
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link">
+                    <i class="fas fa-user-circle"></i>
+                </a>
+                <div class="navbar-dropdown">
+                    <a class="navbar-item">Profile</a>
+                    <a class="navbar-item">Settings</a>
+                    <hr class="navbar-divider">
+                    <a class="navbar-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

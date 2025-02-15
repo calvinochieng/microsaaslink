@@ -1,0 +1,265 @@
+{% extends "dash-base.html" %}
+
+{% block customcss%}
+
+    <style>
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .modal.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Prevent modal from being closed */
+        .modal-background {
+            pointer-events: none;
+        }
+        
+        .modal-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .token-count {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #485fc7;
+        }
+    </style>
+
+{%endblock customcss%}
+{% block content %}
+<div class="columns">
+    <!-- Analysis Input Section -->
+    <div class="column is-4">
+        <div class="box">
+            <h2 class="title is-4 mb-4">
+                <i class="fas fa-search"></i>
+                New Analysis
+            </h2>
+            
+            <form method="post" id="analysis-form">
+                {% csrf_token %}
+                <div class="field">
+                    <label class="label">Enter SaaS URL/Name</label>
+                    <div class="control has-icons-left">
+                        <textarea 
+                            class="textarea" 
+                            placeholder="e.g. https://example.com"
+                            name="target_url"
+                            rows="3"
+                            required
+                        ></textarea>
+                        <span class="icon is-small is-left">
+                            <i class="fas fa-link"></i>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-fullwidth">
+                            <i class="fas fa-magic mr-2"></i>
+                            Analyze Now
+                        </button>
+                    </div>
+                    <p class="help has-text-grey">
+                        Estimated cost: 1 token
+                    </p>
+                </div>
+            </form>
+
+            <!-- Add to form submission -->
+            <div class="notification is-info is-hidden" id="loading-indicator">
+                <button class="delete"></button>
+                Analyzing <i class="fas fa-spinner fa-pulse ml-2"></i>
+            </div>
+
+            <script>
+            document.getElementById('analysis-form').addEventListener('submit', () => {
+                document.getElementById('loading-indicator').classList.remove('is-hidden');
+            });
+            </script>
+
+
+        </div>
+
+        {% comment %}
+
+        <!-- Quick Stats -->
+        <div class="box mt-4">
+            <h3 class="title is-5">
+                <i class="fas fa-tachometer-alt"></i>
+                Usage Stats
+            </h3>
+            <div class="content">
+                <div class="level">
+                    <div class="level-item has-text-centered">
+                        <div>
+                            <p class="heading">Remaining Tokens</p>
+                            <p class="title">{{ user.profile.remaining_tokens }}</p>
+                        </div>
+                    </div>
+                    <div class="level-item has-text-centered">
+                        <div>
+                            <p class="heading">Analyses Today</p>
+                            <p class="title">12</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add to a new stats section -->
+        <div class="box mt-4">
+            <h3 class="title is-5">
+                <i class="fas fa-chart-line"></i>
+                Usage Trends
+            </h3>
+            <canvas id="usageChart"></canvas>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const ctx = document.getElementById('usageChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Daily Analyses',
+                        data: [12, 19, 3, 5, 2, 3, 15],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                }
+            });
+        </script>
+
+    {% endcomment %}
+    </div>
+
+    <!-- Analysis History -->
+    <div class="column is-8">
+        <div class="box">
+            <h2 class="title is-4 mb-4">
+                <i class="fas fa-history"></i>
+                Recent Analyses
+            </h2>
+            
+            <div class="analysis-list">
+       
+                {% for analysis in saas_data %}
+                <div class="card mb-3 analysis-item">
+
+
+
+
+
+                    <div class="card-content">
+                        <div class="media">
+                            <div class="media-left">
+                                <span class="icon is-large">
+                                    <i class="fas fa-2x fa-chart-bar"></i>
+                                </span>
+                            </div>
+                            <div class="media-content">
+                                <p class="title is-5">{{ analysis.name }}</p>
+                                <p class="subtitle is-6">
+                                    <time datetime="{{ analysis.created_at }}">
+                                        {{ analysis.created_at|timesince }} ago
+                                    </time>
+                                </p>
+                            </div>
+                            <div class="media-right">
+                                <span class="tag {% if analysis.status == 'completed' %}is-success{% else %}is-danger{% endif %}">
+                                    {{ analysis.status|title }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="content">
+                            <div class="tags">
+                                <span class="tag">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    {{ analysis.duration }}s
+                                </span>
+                                <span class="tag">
+                                    <i class="fas fa-coins mr-2"></i>
+                                    {{ analysis.token_cost }}
+                                </span>
+                            </div>
+                            <div class="analysis-preview">
+                                {{ analysis.summary|truncatechars:120 }}
+
+                                  {% for point in analysis.key_pain_points %}
+                                    <li>{{ point }}</li>
+                                  {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="card-footer">
+                        <a href="#" class="card-footer-item">
+                            <i class="fas fa-eye mr-2"></i>View
+                        </a>
+                        <a href="#" class="card-footer-item">
+                            <i class="fas fa-download mr-2"></i>Export
+                        </a>
+                        <a href="#" class="card-footer-item">
+                            <i class="fas fa-trash mr-2"></i>Delete
+                        </a>
+                    </footer>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <nav class="pagination is-centered" role="navigation">
+                <a class="pagination-previous">Previous</a>
+                <a class="pagination-next">Next</a>
+                <ul class="pagination-list">
+                    <li><a class="pagination-link is-current">1</a></li>
+                    <li><a class="pagination-link">2</a></li>
+                    <li><a class="pagination-link">3</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal -->
+    <div class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+            <div class="box m-4">
+                <div class="content has-text-centered">
+                    <h1 class="title is-3">Thank you for your interest in MicroSaasLink!</h1>
+                    <p class="subtitle is-5">We're still finishing up our platform...</p>
+                    <div class="my-6">
+                        <p class="is-size-5">For joining early, you've been awarded</p>
+                        <p class="token-count my-4">2 Analysis Tokens</p>
+                    </div>
+                    <p class="is-size-5">We'll notify you once we're up and running!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show modal when page loads
+            const modal = document.querySelector('.modal');
+            modal.classList.add('is-active');
+            
+            // Prevent closing with escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+{% endblock %}
+

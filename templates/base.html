@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta Information -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %} Microsaaslink</title>
+    {% load static %}
+
+    <!-- SEO Meta Tags -->
+    <link rel="icon" href="{% static 'icon.ico' %}" type="image/x-icon">
+
+    <meta name="description" content="{% block description %}{% endblock description %}">
+    <meta name="keywords" content="">
+    <meta name="author" content="Calvin Ochieng">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@calvinochieng_">
+    <meta name="twitter:title" content="">
+    <meta name="twitter:description" content="">
+    <meta name="twitter:image" content="{% static 'app/images/microsaaslink.png' %}">
+    <meta name="twitter:image:alt" content="">
+
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://microsaasl.ink">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="{% static 'app/images/microsaaslink.png' %}">
+    <meta property="og:image:alt" content="">
+    <meta property="og:site_name" content="Microsaas Link">
+    <meta property="og:locale" content="en_US">
+
+
+    <!-- Schema.org (JSON-LD for Rich Results) -->
+    <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "website",
+          "name": "Microsaas Link",
+          "author": {
+            "@type": "Person",
+            "name": "Calvin Ochieng"
+          },
+          "description": "",
+          "image": "{% static 'app/images/microsaaslink.png' %}",
+          "url": "https://microsaasl.ink",
+          "publisher": {
+            "@type": "Organization",
+            "name": "Microsaas Link"
+          },
+          "inLanguage": "en",
+          "datePublished": "2025-2-10"
+        }
+    </script>
+        
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    {% block custom_styles %}{% endblock custom_styles %}
+    <style> 
+        .ribbon-container {
+            position: relative;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .corner-ribbon {
+            position: absolute;
+            top: 25px;
+            right: -50px;
+            transform: rotate(45deg);
+            width: 200px;
+            background-color: #ff3860;
+            color: white;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 1rem;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 100;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(255,56,96,0.5);
+            }
+        }
+    </style>
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="83fb281a-fd05-4d48-8543-7ad5161ce835"></script>
+</head>
+<body>
+    <div class="ribbon-container">
+        <div class="corner-ribbon">Coming Soon</div>
+        <!-- Example content -->
+        <section class="hero is-fullheight">
+            <div class="hero-body">
+                <div class="container has-text-centered">
+                    <h1 class="title">Your Website Title</h1>
+                    <p class="subtitle">Some content here</p>
+                </div>
+            </div>
+        </section>
+    </div>
+     <!-- Navigation Bar -->
+  <nav class="navbar is-transparent">
+   <div class="container">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <img class="logo" src=" {% static 'app/images/icon.png'%}" alt="microsaalink">
+        </a>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+      <div id="navbarBasic" class="navbar-menu">
+        <div class="navbar-end">
+          <a class="navbar-item" href="/#features">Features</a>
+          <a class="navbar-item" href="/#how-it-works">How It Works</a>
+          <a class="navbar-item" href="/#testimonials">Testimonials</a>
+          <a class="navbar-item" href="{% url 'pricing'%}">Pricing</a>
+          <div class="navbar-item">
+            <div class="buttons">
+              <a class="button is-link is-rounded is-outlined" href="{% url 'account_login' %}">
+                <strong>Login</strong>
+              </a>
+              <a class="button is-link is-rounded" href="{% url 'account_signup' %}">
+                <strong>Signup</strong>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+   </div>
+  </nav>
+
+    <!-- Content Section -->
+ 
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="notification is-{{ message.tags }}">
+                {{ message }}
+                <span id="cancel" class="icon has-text-black" style="cursor: pointer;">
+                    <i class="fa fa-times"></i> <!-- Close icon -->
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}
+    {% endblock content %}
+        
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container"> 
+            <div class="columns">
+                <div class="column">
+                    <h4 class="title has-text-white is-size-4">Quick Links</h4>
+                    <ul>                           
+                        <li><a href="/#"></a></li>
+                    </ul>
+                    
+                    <p>
+                        <a href="/about">About</a> | <a href="/#features">Features</a> | <a href="{% url 'pricing'%}">Pricing</a> | <a href="#">Contact</a>
+                    </p>
+                </div>
+                <div class="column">
+                    <h4 class="title has-text-white is-size-4">Partner Websites</h4>
+                    <ul>
+                        <li><a href="https://xtuls.com/">Xtuls</a></li>
+                        <li><a href="https://5munlocked.ink/">5MUnlocked</a></li>
+                    </ul>
+                </div>
+                <div class="column">
+                    <h4 class="title has-text-white is-size-4">Social Links</h4>
+                    <div class="social-icons">
+                        <a href="https://x.com/calvinochieng" class="icon is-medium"><i class="fab fa-x-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="content has-text-centered">
+                <p>&copy; <span id="year"></span> Microsaas Link. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+
+    <!-- JavaScript -->
+    <script>
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+    <script>
+        document.querySelector('.navbar-burger').addEventListener('click', function () {
+            const target = document.getElementById(this.dataset.target);
+            target.classList.toggle('is-active');
+        });
+    </script>
+    <!-- Showing the messages etc -->
+    <script>
+        // Select the cancel button
+        const cancel = document.querySelector('#cancel');
+        const messageContainer = document.querySelector('.messages');
+        
+        // Timer to automatically remove the message after 5 seconds
+        let autoRemoveTimer = setTimeout(() => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 5000); // 5000ms = 5 seconds
+
+        // Function to manually remove the message
+        const removeMessage = () => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+            clearTimeout(autoRemoveTimer); // Clear the timer to prevent conflicts
+        };
+
+        if (cancel){ cancel.addEventListener('click', removeMessage);}
+    </script>
+    
+    {% block scripts %}{% endblock scripts %}
+        
+</body>
+</html>
