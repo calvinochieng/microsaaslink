@@ -143,31 +143,35 @@
 {% endblock custom_styles %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="hero">
-  <div class="hero-body">
-    <div class="container">
-      <div class="columns is-centered">
-        <div class="column is-8 has-text-centered">
-          <h1 class="title">
-            Uncover Hidden MicroSaaS Gold Mines in Existing Markets
-          </h1>
-          <p class="subtitle has-text-white is-size-4 mb-6">
-            Turn established SaaS pain points into profitable micro-products. Get data-driven insights and ready-to-build opportunities.
-          </p>
-          <div class="buttons is-centered">
-            <a href="{% url 'account_signup' %}" class="button is-link is-rounded is-medium">
-              Start Your Analysis
-            </a>
-            <a href="#how-it-works" class="button is-white is-outlined is-rounded">
-              See How It Works
-            </a>
+
+
+<div class="ribbon-container">
+  <div class="corner-ribbon">Coming Soon</div>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-centered">
+          <div class="column is-8 has-text-centered">
+            <h1 class="title">
+              Uncover Hidden MicroSaaS Gold Mines in Existing Markets
+            </h1>
+            <p class="subtitle has-text-white is-size-4 mb-6">
+              Turn established SaaS pain points into profitable micro-products. Get data-driven insights and ready-to-build opportunities.
+            </p>
+            <div class="buttons is-centered">
+              <a href="{% url 'account_signup' %}" class="button is-link is-rounded is-medium">
+                Start Your Analysis
+              </a>
+              <a href="#how-it-works" class="button is-white is-outlined is-rounded">
+                See How It Works
+              </a>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+</div>
 
 <!-- Analyzed SaaS Section -->
 <section class="section" id="analyzed-saas">

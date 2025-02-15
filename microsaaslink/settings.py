@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'django_summernote',
     'cloudinary_storage',
     'cloudinary',
     # Local Apps
@@ -115,19 +114,6 @@ LOGGING = {
 
 ACCOUNT_LOGIN_ON_GET = True
 
-SUMMERNOTE_CONFIG = {
-    'summernote': {
-        'width': '100%',
-        'height': '400px',
-        'toolbar': [
-            ['style', ['bold', 'italic', 'underline', 'clear']],
-            ['font', ['strikethrough', 'superscript', 'subscript']],
-            ['para', ['ul', 'ol', 'paragraph']],
-            ['insert', ['link', 'picture', 'video']],
-            ['view', ['fullscreen', 'codeview', 'help']],
-        ],
-    },
-}
 CLOUDINARY_STORAGE = {
             'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
             'API_KEY': config('CLOUDINARY_API_KEY'),
