@@ -17,29 +17,25 @@
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@calvinochieng_">
-    <meta name="twitter:title" content="">
-    <meta name="twitter:description" content="">
-    <meta name="twitter:image" content="{% static 'app/images/microsaaslink.png' %}">
-    <meta name="twitter:image:alt" content="">
+    <meta name="twitter:image:alt" content="Microsaaslink">
 
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://microsaasl.ink">
-    <meta property="og:title" content="">
-    <meta property="og:description" content="">
-    <meta property="og:image" content="{% static 'app/images/microsaaslink.png' %}">
-    <meta property="og:image:alt" content="">
-    <meta property="og:site_name" content="Microsaas Link">
+    <meta property="og:image:alt" content="Microsaaslink">
+    <meta property="og:site_name" content="Microsaaslink">
     <meta property="og:locale" content="en_US">
 
+    
+    {% block meta %} {% endblock meta %}
 
     <!-- Schema.org (JSON-LD for Rich Results) -->
     <script type="application/ld+json">
         {
           "@context": "https://schema.org",
           "@type": "website",
-          "name": "Microsaas Link",
+          "name": "Microsaaslink",
           "author": {
             "@type": "Person",
             "name": "Calvin Ochieng"
@@ -66,40 +62,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'app/styles.css' %}">
     {% block custom_styles %}{% endblock custom_styles %}
-    <style> 
-        .ribbon-container {
-            position: relative;
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .corner-ribbon {
-            position: absolute;
-            top: 25px;
-            right: -50px;
-            transform: rotate(45deg);
-            width: 200px;
-            background-color: #ff3860;
-            color: white;
-            text-align: center;
-            text-transform: uppercase;
-            font-weight: bold;
-            font-size: 1rem;
-            padding: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
-            z-index: 100;
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 10px rgba(0,0,0,0.2);
-            }
-            to {
-                box-shadow: 0 0 20px rgba(255,56,96,0.5);
-            }
-        }
-    </style>
     <script defer src="https://cloud.umami.is/script.js" data-website-id="83fb281a-fd05-4d48-8543-7ad5161ce835"></script>
 </head>
 <body>

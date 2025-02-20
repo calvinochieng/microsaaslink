@@ -3,8 +3,21 @@
 
 {% block title %}Pricing | {% endblock title %}
 
-{% block description %}Simple token based prcing that, no  monotonouse monthy subscription, pay for what you use{% endblock description %}
+{% block description %}Simple token based prcing that, no  monotonous monthy subscription, pay for what you use{% endblock description %}
 {% load static %}
+
+{% block meta %}
+<!-- meta seo -->
+    <meta property="og:title" content="Pricing | Microsaaslink">
+    <meta property="og:description" content="Simple token based prcing that, no  monotonous monthy subscription, pay for what you use">
+    <meta property="og:image" content="{% static 'app/images/microsaaslink.png' %}">
+    
+    <meta name="twitter:title" content=" Pricing | Microsaaslink">
+    <meta name="twitter:description" content="Simple token based prcing that, no  monotonous monthy subscription, pay for what you use">
+    <meta name="twitter:image" content="{% static 'app/images/microsaaslink.png' %}">
+    
+{% endblock meta %}
+
 
 {% block custom_styles %}
   <style>
@@ -144,7 +157,7 @@
   <div class="navbar is-index-hidden is-transparent">
    <div class="container">
     <div class="navbar-brand">
-        <a class="navbar-item" href="#">
+        <a class="navbar-item" href="/">
           <img class="logo" src=" {% static 'app/images/icon.png'%}" alt="microsaalink">
         </a>
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
@@ -180,13 +193,13 @@
       <p class="has-text-centered is-size-5 mb-6">Pay only for the analyses you need - no monthly commitments</p>
 
       <div class="columns is-centered">
-        <!-- Trial Pack -->
+        <!-- Starter Pack -->
         <div class="column">
           <div class="feature-card has-text-centered">
-            <h3 class="title is-3 mb-2">Trial Pack</h3>
+            <h3 class="title is-3 mb-2">Starter Pack</h3>
             <div class="pricing-amount mb-4">
-              <p class="title is-1">$0.0</p>
-              <p class="subtitle is-5 has-text-primary">2 Analysis Tokens</p>
+              <p class="title is-1">$19</p>
+              <p class="subtitle is-5 has-text-primary">7 Analysis Tokens</p>
             </div>
             <div class="content mb-5">
               <ul class="has-text-left">
@@ -197,7 +210,7 @@
                 <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 2 months</li>
               </ul>
             </div>
-            <a href=" {% url 'dashboard' %}" class="button is-primary is-rounded is-outlined is-fullwidth">Start Free Trial</a>
+            <a href=" {% url 'dashboard' %}"  class="button is-primary is-rounded is-outlined is-fullwidth">Buy Now</a>
           </div>
         </div>
 
@@ -223,13 +236,13 @@
             <a href=" {% url 'dashboard' %}" class="button is-primary is-rounded is-fullwidth">Buy Now</a>
           </div>
         </div>
-        <!-- Starter Pack -->
+        <!-- Trial Pack -->
         <div class="column">
           <div class="feature-card has-text-centered">
-            <h3 class="title is-3 mb-2">Starter Pack</h3>
+            <h3 class="title is-3 mb-2">Trial Pack</h3>
             <div class="pricing-amount mb-4">
-              <p class="title is-1">$19</p>
-              <p class="subtitle is-5 has-text-primary">5 Analysis Tokens</p>
+              <p class="title is-1">$0.0</p>
+              <p class="subtitle is-5 has-text-primary">2 Analysis Tokens</p>
             </div>
             <div class="content mb-5">
               <ul class="has-text-left">
@@ -237,10 +250,10 @@
                 <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Detailed pain point scoring</li>
                 <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Comprehensive opportunity analysis</li>
                 <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Technical feasibility reports</li>
-                <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 2 months</li>
+                <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 14 days</li>
               </ul>
             </div>
-            <a href=" {% url 'dashboard' %}"  class="button is-primary is-rounded is-outlined is-fullwidth">Buy Now</a>
+            <a href=" {% url 'dashboard' %}" class="button is-primary is-rounded is-outlined is-fullwidth">Start Free Trial</a>
           </div>
         </div>
 
@@ -259,7 +272,7 @@
         <div class="column is-6">
           <div class="content">
             <h4 class="is-size-5 mb-3">How long are tokens valid?</h4>
-            <p>Tokens validity varies by package - from 6 months for Starter Pack to 18+ months for larger packs. Unused tokens expire after their validity period.</p>
+            <p>Tokens validity varies by package - theyre clearly stated on each packages. Unused tokens expire after their validity period.</p>
           </div>
         </div>
         <div class="column is-6">

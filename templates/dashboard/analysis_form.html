@@ -1,0 +1,159 @@
+<div class="box">
+    <h2 class="title is-4">Analyze SaaS Product</h2>
+    
+    {% if error_message %}
+    <div class="notification is-danger">
+        <button class="delete"></button>
+        {{ error_message }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'analysis' %}" id="analysisForm">
+        {% csrf_token %}
+        <div class="field">
+            <label class="label">Product Name</label>
+            <div class="control">
+                <input 
+                    class="input {% if form_errors.name %}is-danger{% endif %}" 
+                    type="text" 
+                    name="name" 
+                    value="{{ name|default:'' }}"
+                    placeholder="e.g., Render"
+                    required
+                >
+            </div>
+            {% if form_errors.name %}
+            <p class="help is-danger">{{ form_errors.name }}</p>
+            {% endif %}
+        </div>
+
+        <div class="field">
+            <label class="label">Product URL</label>
+            <div class="control">
+                <input 
+                    class="input {% if form_errors.url %}is-danger{% endif %}" 
+                    type="url" 
+                    name="url" 
+                    value="{{ url|default:'' }}"
+                    placeholder="e.g., https://render.com"
+                    required
+                >
+            </div>
+            {% if form_errors.url %}
+            <p class="help is-danger">{{ form_errors.url }}</p>
+            {% endif %}
+        </div>
+
+        <div class="field">
+            <label class="label">Description (Optional)</label>
+            <div class="control">
+                <textarea 
+                    class="textarea" 
+                    name="description" 
+                    placeholder="Additional context about the product..."
+                >{{ description|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <div class="field">
+            <div class="control">
+                <button 
+                    type="submit" 
+                    class="button is-primary" 
+                    id="submitButton"
+                >
+                    <span class="icon">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <span>Analyze Product</span>
+                </button>
+            </div>
+            <div>
+                <p class="heading has-text-grey">Estimated cost: <strong>1 token</strong> </p>
+                <p class="heading">Remaining Tokens: <strong> {{ user.profile.remaining_tokens }}</strong></p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Handle form validation
+        const form = document.getElementById('analysisForm');
+        const submitButton = document.getElementById('submitButton');
+        
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Reset previous errors
+            document.querySelectorAll('.is-danger').forEach(el => {
+                el.classList.remove('is-danger');
+            });
+            document.querySelectorAll('.help.is-danger').forEach(el => {
+                el.remove();
+            });
+            
+            // Validate inputs
+            const name = form.querySelector('input[name="name"]').value.trim();
+            const url = form.querySelector('input[name="url"]').value.trim();
+            let hasError = false;
+            
+            if (!name) {
+                const nameInput = form.querySelector('input[name="name"]');
+                nameInput.classList.add('is-danger');
+                const help = document.createElement('p');
+                help.className = 'help is-danger';
+                help.textContent = 'Product name is required';
+                nameInput.parentNode.appendChild(help);
+                hasError = true;
+            }
+            
+            if (!url) {
+                const urlInput = form.querySelector('input[name="url"]');
+                urlInput.classList.add('is-danger');
+                const help = document.createElement('p');
+                help.className = 'help is-danger';
+                help.textContent = 'Product URL is required';
+                urlInput.parentNode.appendChild(help);
+                hasError = true;
+            } else if (!isValidUrl(url)) {
+                const urlInput = form.querySelector('input[name="url"]');
+                urlInput.classList.add('is-danger');
+                const help = document.createElement('p');
+                help.className = 'help is-danger';
+                help.textContent = 'Please enter a valid URL';
+                urlInput.parentNode.appendChild(help);
+                hasError = true;
+            }
+            
+            if (!hasError) {
+                // Show loading state
+                submitButton.classList.add('is-loading');
+                submitButton.disabled = true;
+                
+                // Submit form
+                form.submit();
+            }
+        });
+        
+        // URL validation helper using built-in URL constructor
+        function isValidUrl(string) {
+            try {
+                const urlString = string.toLowerCase();
+                // If no protocol is specified, add http://
+                const urlToTest = urlString.startsWith('http') ? urlString : `http://${urlString}`;
+                new URL(urlToTest);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        // Handle notification dismissal
+        document.querySelectorAll('.notification .delete').forEach(button => {
+            button.addEventListener('click', () => {
+                button.parentNode.remove();
+            });
+        });
+    });
+</script>

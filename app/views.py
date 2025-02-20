@@ -5,7 +5,17 @@ from django.http import HttpResponseBadRequest
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from analysis import analyzer
+
+
+
+from django.shortcuts import render
+from analysis.analyzer import gen
+import json
+from django.views.decorators.http import require_http_methods
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
+import re
+
 
 from .forms import *
 from .models import *
@@ -139,224 +149,85 @@ def dashboard(request):
     }
     return render(request, 'dashboard/dashboard.html', context)
 
+
+@require_http_methods(["GET", "POST"])
 def analysis(request):
-  
-    name = "Render"
-    url = "render.com"
-    description = ""
-    input = f"""
-            INPUT:
-            - SaaS Product Name/URL: [NAME: {name}, URL:{url}]
-            - SaaS Description: [{description}]
-            
-            TASK/OBJECTIVE:
-            Identify the most critical as well as the none critical pain points based on user feedback for a given SaaS product and propose 1–2 highly targeted micro-SaaS solutions that directly address these issues. The proposed solutions may either:
-            - Supplement the existing SaaS as a plugin, extension, or add-on that enhances its functionality, or
-            - Compete as an independent tool, solving the identified issues in a superior way and potentially capturing market share.
-
-            The AI should extract insights from user feedback across relevant platforms (e.g., ProductHunt, G2, Trustpilot, Reddit, Twitter, official forums) by examining the provided SaaS product (via its Name, URL, and Description, if available) to determine its pain points and recommend actionable micro-SaaS opportunities.
-
-            Please ensure the final output is a valid JSON object with separate keys for each category, and that each array contains individual JSON objects (do not include inline comments in the output).
+    context = {
+        'form_errors': {},
+        'analysis_data': None
+    }
     
-            OUTPUT FORMAT (JSON):
-            
-            {{
-            "SaaS_Product": {{
-                "Name": "NAME",
-                "URL": "URL",
-                "Description": "Give your description from your analysis if not provided by the user"
-            }},
-            "Prioritized_Pain_Points": [
-                {{
-                "Category": "Onboarding/UX/Performance/Integrations",
-                "Pain_Point": "Specific issue (e.g., slow load times for image-heavy pages)",
-                "Severity": "High/Medium (based on frequency and sentiment)",
-                "Evidence": "Example user quote or metric from reviews"
-                }}
-                // Additional pain point objects if applicable.
-            ],
-            "Top_MicroSaaS_Ideas": [
-                {{
-                "Name": "Unique Tool Name",
-                "Core_Problem_Solved": "Clear problem statement",
-                "Solution_Description": "How it solves the pain point better than the original product",
-                "Key_Features": "Must-have features (e.g., one-click optimization)",
-                "Target_Audience": "Specific segment (e.g., solo creators, small agencies)",
-                "Validation": {{
-                    "Market_Gap": "No existing tools for [specific use case]",
-                    "Feasibility": "Low-code/no-code friendly or existing APIs to leverage",
-                    "Monetization_Potential": "Pricing model (e.g., $10/mo for power users)"
-                }}
-                }}
-                // Optionally, a second idea can be provided.
-            ]
-            }}
-        """ 
-     
+    if request.method == "POST":
+        # Get form data
+        name = request.POST.get('name', '').strip()
+        url = request.POST.get('url', '').strip()
+        description = request.POST.get('description', '').strip()
+        
+        # Validate inputs
+        if not name:
+            context['form_errors']['name'] = 'Product name is required'
+        
+        if not url:
+            context['form_errors']['url'] = 'Product URL is required'
+        else:
+            # Validate URL format
+            url_validator = URLValidator()
+            try:
+                # Add http:// if not present for validation
+                if not url.startswith(('http://', 'https://')):
+                    url = 'http://' + url
+                url_validator(url)
+            except ValidationError:
+                context['form_errors']['url'] = 'Please enter a valid URL'
+        
+        # If no errors, proceed with analysis
+        if not context['form_errors']:
+            try:
+                # Get analysis results
+                result = gen(name, url)
+                
+                # Debug print
+                print("Raw result:", result)
+                
+                # Clean and parse the JSON
+                try:
+                    # Method 1: Extract JSON string if wrapped in code blocks
+                    if "```json" in result:
+                        # Extract content between ```json and ```
+                        json_str = re.search(r'```json\n(.*?)\n```', result, re.DOTALL)
+                        if json_str:
+                            result = json_str.group(1)
+                    elif "```" in result:
+                        # Extract content between ``` and ```
+                        json_str = re.search(r'```\n(.*?)\n```', result, re.DOTALL)
+                        if json_str:
+                            result = json_str.group(1)
+                    
+                    # Method 2: Clean the string
+                    result = result.strip()
+                    if result.startswith('`') and result.endswith('`'):
+                        result = result[1:-1]
+                    
+                    # Parse JSON
+                    analysis_data = json.loads(result)
+                    print("Parsed data:", analysis_data)  # Debug print
+                    context['analysis_data'] = analysis_data
+                    
+                except json.JSONDecodeError as e:
+                    print("JSON Decode Error:", str(e))  # Debug print
+                    print("Attempted to parse:", result)  # Debug print
+                    context['error_message'] = f'Error processing analysis results: {str(e)}'
+                    
+            except Exception as e:
+                print("General Error:", str(e))  # Debug print
+                context['error_message'] = f'Error performing analysis: {str(e)}'
+        
+        # Add form data back to context for form repopulation
+        context.update({
+            'name': name,
+            'url': url,
+            'description': description
+        })
     
-    return render(request, {"input": input})
+    return render(request, 'dashboard/analysis.html', context)
 
-
-def create_analysis_prompt(name, url, description=""):
-    return f"""
-    INPUT:
-    - SaaS Product Name/URL: [NAME: {name}, URL: {url}]
-    - SaaS Description: [{description}]
-
-    TASK/OBJECTIVE:
-    Conduct a comprehensive analysis of the specified SaaS product to identify market opportunities and pain points, following these steps:
-
-    1. INITIAL RESEARCH PHASE:
-    - Analyze the product's core features and value proposition
-    - Identify primary user segments and use cases
-    - Map the competitive landscape
-    - Review pricing strategy and business model
-
-    2. DATA COLLECTION SOURCES:
-    Gather user feedback and sentiment from:
-    - Product reviews (G2, Capterra, TrustPilot etc)
-    - Community discussions (Reddit, Twitter, LinkedIn)
-    - Technical forums (StackOverflow, GitHub Issues)
-    - Product feedback boards
-    - User interviews and testimonials
-    - Feature request threads
-    - Competitor comparison discussions
-
-    3. ANALYSIS CRITERIA:
-    Evaluate pain points based on:
-    - Frequency of mention
-    - Sentiment intensity
-    - Impact on user workflow
-    - Technical feasibility of solution
-    - Market size of affected users
-    - Revenue potential
-    - Implementation complexity
-
-    OUTPUT FORMAT (JSON):
-    {{
-        "SaaS_Product": {{
-            "Name": "NAME",
-            "URL": "URL",
-            "Description": "Comprehensive description based on analysis",
-            "Core_Features": [
-                "Feature 1",
-                "Feature 2"
-            ],
-            "Target_Market": [
-                "Primary user segment",
-                "Secondary user segment"
-            ],
-            "Current_Pricing": {{
-                "Model": "Freemium/Premium/Enterprise",
-                "Price_Range": "Price points",
-                "Key_Limitations": [
-                    "Limitation 1",
-                    "Limitation 2"
-                ]
-            }}
-        }},
-        "Market_Analysis": {{
-            "Total_Reviews_Analyzed": "Number",
-            "Sentiment_Overview": {{
-                "Positive": "Percentage",
-                "Neutral": "Percentage",
-                "Negative": "Percentage"
-            }},
-            "Key_Competitors": [
-                {{
-                    "Name": "Competitor name",
-                    "Differential": "Key difference"
-                }}
-            ]
-        }},
-        "Prioritized_Pain_Points": [
-            {{
-                "Category": "UX/Performance/Integration/etc.",
-                "Pain_Point": "Specific issue description",
-                "Severity": "High/Medium/Low",
-                "Frequency": "Percentage of mentions",
-                "Impact": "Business impact description",
-                "Affected_Segments": [
-                    "User segment 1",
-                    "User segment 2"
-                ],
-                "Evidence": [
-                    {{
-                        "Source": "Platform name",
-                        "Quote": "User quote",
-                        "Date": "Approximate date",
-                        "Sentiment": "Negative/Neutral/Positive"
-                    }}
-                ]
-            }}
-        ],
-        "Opportunity_Analysis": {{
-            "Market_Gaps": [
-                {{
-                    "Gap": "Description",
-                    "Size": "Estimated market size",
-                    "Validation": "Evidence of demand"
-                }}
-            ],
-            "Technical_Feasibility": {{
-                "Available_APIs": [
-                    "API 1 description",
-                    "API 2 description"
-                ],
-                "Integration_Points": [
-                    "Integration point 1",
-                    "Integration point 2"
-                ]
-            }}
-        }},
-        "MicroSaaS_Recommendations": [
-            {{
-                "Name": "Product name",
-                "Type": "Plugin/Standalone/Integration",
-                "Core_Problem": "Primary pain point addressed",
-                "Solution_Description": "Detailed solution approach",
-                "Key_Features": [
-                    {{
-                        "Feature": "Feature name",
-                        "Purpose": "Problem it solves",
-                        "Priority": "Must-have/Nice-to-have"
-                    }}
-                ],
-                "Target_Audience": {{
-                    "Primary": "Main user segment",
-                    "Secondary": "Additional segments",
-                    "Market_Size": "Estimated TAM"
-                }},
-                "Business_Model": {{
-                    "Revenue_Model": "Subscription/One-time/Usage-based",
-                    "Pricing_Strategy": "Pricing tiers and rationale",
-                    "Expected_MRR": "Revenue projection"
-                }},
-                "Implementation": {{
-                    "Technical_Stack": [
-                        "Technology 1",
-                        "Technology 2"
-                    ],
-                    "Development_Timeline": "Estimated timeline",
-                    "Resource_Requirements": "Team/Skills needed"
-                }},
-                "Go_To_Market": {{
-                    "Distribution_Channels": [
-                        "Channel 1",
-                        "Channel 2"
-                    ],
-                    "Marketing_Strategy": "Key marketing approaches",
-                    "Growth_Metrics": "KPIs to track"
-                }}
-            }}
-        ]
-    }}
-
-    ADDITIONAL GUIDELINES:
-    - All findings must be based on actual user feedback and market data
-    - Pain points should be validated across multiple sources
-    - Solutions should have clear differentiation from existing offerings
-    - Include specific evidence and examples where possible
-    - Focus on actionable opportunities with clear market demand
-    - Consider both technical feasibility and business viability
-    """
