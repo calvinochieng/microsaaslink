@@ -13,8 +13,8 @@ def gen(name, url):
     - SaaS Product Name/URL: [NAME: {name}, URL: {url}]
     - SaaS Description: [{description}]
 
-    TASK/OBJECTIVE:
-    Conduct a comprehensive analysis of the specified SaaS product to identify market opportunities and pain points, following these steps:
+    TASK/OBJECTIVE: 
+    Conduct a comprehensive analysis of the specified SaaS product to two or more micro-SaaS opportunities based on the users pain points, following these steps:
 
     1. INITIAL RESEARCH PHASE:
     - Analyze the product's core features and value proposition
@@ -67,6 +67,7 @@ def gen(name, url):
         }},
         "market_analysis": {{
             "total_reviews_analyzed": "Number",
+            //sentiment_overview MUST BE PERCENTAGE NUMBER, IF CANT BE FOUND JUST PUT 0% ON ALL
             "sentiment_overview": {{
                 "positive": "Percentage",
                 "neutral": "Percentage",

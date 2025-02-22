@@ -1,17 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login
 from django.contrib import messages
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
+
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
-
-
-from django.shortcuts import render
 from analysis.analyzer import gen
 import json
-from django.views.decorators.http import require_http_methods
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 import re
@@ -144,13 +141,36 @@ def pricing(request):
 
 @login_required
 def dashboard(request):
+    # Get analyses for the current user only, ordered by newest first
+    saas_data = SaaSAnalysis.objects.filter(
+        user=request.user
+    ).order_by('-created_at')
+    
     context = {
-        'saas_data': None
+        'saas_data': saas_data
     }
     return render(request, 'dashboard/dashboard.html', context)
 
 
-@require_http_methods(["GET", "POST"])
+
+@login_required
+def analysis_detail(request, slug):
+    analysis = get_object_or_404(SaaSAnalysis, slug=slug, user=request.user)
+    context = {
+        'analysis_data': analysis.analysis_result,
+        'has_data': bool(analysis.analysis_result)
+    }
+    return render(request, 'dashboard/analysis_detail.html', context)
+
+@login_required
+def analysis_export(request, slug):
+    analysis = get_object_or_404(SaaSAnalysis, slug=slug, user=request.user)
+    # Your export logic here
+
+
+
+    
+@login_required
 def analysis(request):
     context = {
         'form_errors': {},
@@ -210,7 +230,7 @@ def analysis(request):
                     
                     # Parse JSON
                     analysis_data = json.loads(result)
-                    print("Parsed data:", analysis_data)  # Debug print
+                    # print("Parsed data:", analysis_data)  # Debug print
                     context['analysis_data'] = analysis_data
                     
                 except json.JSONDecodeError as e:
@@ -231,3 +251,86 @@ def analysis(request):
     
     return render(request, 'dashboard/analysis.html', context)
 
+
+
+@login_required
+def analysis_api(request):
+    if request.method != "POST":
+        return JsonResponse({"message": "Method not allowed"}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON in request body."}, status=400)
+    
+    name = data.get('name', '').strip()
+    url = data.get('url', '').strip()
+    
+    form_errors = {}
+    
+    if not name:
+        form_errors['name'] = 'Product name is required'
+    
+    if not url:
+        form_errors['url'] = 'Product URL is required'
+    else:
+        url_validator = URLValidator()
+        try:
+            if not url.startswith(('http://', 'https://')):
+                url = 'http://' + url
+            url_validator(url)
+        except ValidationError:
+            form_errors['url'] = 'Please enter a valid URL'
+    
+    if form_errors:
+        return JsonResponse({"form_errors": form_errors}, status=400)
+    
+    try:
+        result = gen(name, url)  # Assuming this is your analysis function
+        
+        # Clean up the result
+        if isinstance(result, str):
+            # Extract JSON if wrapped in code blocks
+            if "```json" in result:
+                match = re.search(r'```json\n(.*?)\n```', result, re.DOTALL)
+                if match:
+                    result = match.group(1)
+            elif "```" in result:
+                match = re.search(r'```\n(.*?)\n```', result, re.DOTALL)
+                if match:
+                    result = match.group(1)
+            
+            result = result.strip()
+            # Remove any stray backticks
+            if result.startswith('`') and result.endswith('`'):
+                result = result[1:-1].strip()
+        
+        # Parse JSON
+        analysis_data = json.loads(result)
+        
+        # Make sure description exists before using it
+        description = analysis_data.get('description', '')  # Get description from analysis_data
+        
+        # Save analysis result
+        analysis = SaaSAnalysis.objects.create(
+            user=request.user,
+            product_name=name,
+            product_url=url,
+            description=description,
+            analysis_result=analysis_data
+        )
+        
+        return JsonResponse({
+            "analysis_id": analysis.id,
+            "result": analysis_data
+        }, status=201)  # Using 201 Created for successful resource creation
+        
+    except json.JSONDecodeError as e:
+        return JsonResponse({
+            "error": f"Error processing analysis results: {str(e)}",
+            "raw_result": result if isinstance(result, str) else str(result)
+        }, status=500)
+    except Exception as e:
+        return JsonResponse({
+            "error": f"Error performing analysis: {str(e)}"
+        }, status=500)

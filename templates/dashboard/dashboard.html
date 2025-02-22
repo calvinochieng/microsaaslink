@@ -2,102 +2,106 @@
 
 {% block customcss%}
 
-    <style></style>
+    <style>
+        .analysis-item{
+            box-shadow: none !important;
+            border: 1px solid #80808026;
+            border-radius: 5px !important;
+        }
+    </style>
 
 {%endblock customcss%}
 {% block content %}
-<div class="columns">
-    <!-- Analysis Input Section -->
-    <div class="column is-4">
-        {% include 'dashboard/analysis_form.html' %}
-    </div>
+    <div class="columns">
+        <!-- Analysis Input Section -->
+        <div class="column is-5">
+            {% include 'dashboard/analysis_form.html' %}
+        </div>
 
-    <!-- Analysis History -->
-    <div class="column is-8">
-        <div class="box">
-            <h2 class="title is-4 mb-4">
-                <i class="fas fa-history"></i>
-                Recent Analyses
-            </h2>
-            
-            <div class="analysis-list">
-       
-                {% for analysis in saas_data %}
-                <div class="card mb-3 analysis-item">
+        <!-- Analysis History -->
+        <div class="column is-7">
+            <div class="box p-4">
+                <h2 class="title is-4 mb-4">
+                    <i class="fas fa-history"></i>
+                    Recent Analyses
+                </h2>
 
 
+                <div class="analysis-list">               
 
-
-
-                    <div class="card-content">
-                        <div class="media">
-                            <div class="media-left">
-                                <span class="icon is-large">
-                                    <i class="fas fa-2x fa-chart-bar"></i>
-                                </span>
-                            </div>
-                            <div class="media-content">
-                                <p class="title is-5">{{ analysis.name }}</p>
-                                <p class="subtitle is-6">
-                                    <time datetime="{{ analysis.created_at }}">
-                                        {{ analysis.created_at|timesince }} ago
-                                    </time>
-                                </p>
-                            </div>
-                            <div class="media-right">
-                                <span class="tag {% if analysis.status == 'completed' %}is-success{% else %}is-danger{% endif %}">
-                                    {{ analysis.status|title }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="content">
-                            <div class="tags">
-                                <span class="tag">
-                                    <i class="fas fa-clock mr-2"></i>
-                                    {{ analysis.duration }}s
-                                </span>
-                                <span class="tag">
-                                    <i class="fas fa-coins mr-2"></i>
-                                    {{ analysis.token_cost }}
-                                </span>
-                            </div>
-                            <div class="analysis-preview">
-                                {{ analysis.summary|truncatechars:120 }}
-
-                                  {% for point in analysis.key_pain_points %}
-                                    <li>{{ point }}</li>
-                                  {% endfor %}
-                            </div>
-                        </div>
+                    <div id="analysisItems" class="mt-6">
+                        <!-- Analysis items will be dynamically added here -->
                     </div>
-                    <footer class="card-footer">
-                        <a href="#" class="card-footer-item">
-                            <i class="fas fa-eye mr-2"></i>View
-                        </a>
-                        <a href="#" class="card-footer-item">
-                            <i class="fas fa-download mr-2"></i>Export
-                        </a>
-                        <a href="#" class="card-footer-item">
-                            <i class="fas fa-trash mr-2"></i>Delete
-                        </a>
-                    </footer>
+           
+                    {% for analysis in saas_data %}
+                        <div class="card mb-3 p-3 analysis-item">
+                            <div class="">
+                                <div class="media">
+                                    <div class="media-content">
+                                        <p class="title is-5">
+                                            {{ analysis.product_name }}
+                                            <span class="tag {% if analysis.analysis_result %}is-success{% else %}is-warning{% endif %}">
+                                                {{ analysis.analysis_result|yesno:"Completed,Processing" }}
+                                            </span>
+                                        </p>
+                                        <p class="is-5" style="margin-top: -1.5rem !important;">
+                                            <a href="{{analysis.analysis_result.saas_product.url}}">{{analysis.analysis_result.saas_product.url}}</a>
+                                        </p>
+                                    </div>
+                                    <div class="media-right">
+                                        <a class="button is-link" href="{% url 'analysis_detail' analysis.slug %}">View</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="content">
+                                    <div class="analysis-preview">
+                                        {{ analysis.analysis_result.saas_product.description|truncatechars:120 }}                                        
+                                    </div>
+
+                                    <div class="columns mt-2">
+                                        <div class="column">                                                
+                                            <p class="">
+                                                <strong>Reviews Analyzed</strong> <br>
+                                                <span class="is-2">{{ analysis.analysis_result.market_analysis.total_reviews_analyzed }}</span>
+                                            </p>
+                                        </div>
+                                        <div class="column">                                                
+                                            <strong>Sentiment Overview</strong>
+                                            <div class="tags">
+                                                <span class="tag is-success">
+                                                    {{ analysis.analysis_result.market_analysis.sentiment_overview.positive }} Positive
+                                                </span>
+                                                <span class="tag is-warning">
+                                                    {{ analysis.analysis_result.market_analysis.sentiment_overview.neutral }} Neutral
+                                                </span>
+                                                <span class="tag is-danger">
+                                                    {{ analysis.analysis_result.market_analysis.sentiment_overview.negative }} Negative
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="notification is-info mb-4">
+                            No analyses yet. Start by analyzing a SaaS product above!
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                
+                <nav class="pagination is-centered" role="navigation">
+                    <a class="pagination-previous">Previous</a>
+                    <a class="pagination-next">Next</a>
+                    <ul class="pagination-list">
+                        <li><a class="pagination-link is-current">1</a></li>
+                        <li><a class="pagination-link">2</a></li>
+                        <li><a class="pagination-link">3</a></li>
+                    </ul>
+                </nav>
             </div>
-            
-            <nav class="pagination is-centered" role="navigation">
-                <a class="pagination-previous">Previous</a>
-                <a class="pagination-next">Next</a>
-                <ul class="pagination-list">
-                    <li><a class="pagination-link is-current">1</a></li>
-                    <li><a class="pagination-link">2</a></li>
-                    <li><a class="pagination-link">3</a></li>
-                </ul>
-            </nav>
         </div>
     </div>
-</div>
 
 {% endblock %}
 
