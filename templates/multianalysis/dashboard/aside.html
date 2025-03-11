@@ -1,0 +1,180 @@
+{% load static %}
+<!-- Side Drawer -->
+<aside class="side-drawer is-hidden-touch collapsed" id="sideDrawer">
+    <div class="brand">
+        <div class="is-flex is-justify-content-flex-end is-align-items-center p-4">
+	        <button class="drawer-toggle" id="drawerToggle">
+	            <i class="fas fa-chevron-left"></i>
+	        </button>
+        </div>
+    </div>
+    
+    <nav class="menu">
+        <ul class="menu-list">
+            <li>
+                <a href="{% url 'saas_analyzer:dashboard' %}" {% if request.resolver_match.url_name == 'dashboard' %}class="is-active"{% endif %}>
+                   <span class="icon"> <i class="fas fa-home fa-fw mr-2"></i></span>
+                    <span class="menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'saas_analyzer:results' %}" {% if request.resolver_match.url_name == 'results' %}class="is-active"{% endif %}>
+                    <i class="fas fa-project-diagram fa-fw mr-2"></i>
+                    <span class="menu-text">Projects</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'saas_analyzer:analyze_saas' %}" {% if request.resolver_match.url_name == 'analyze_saas' %}class="is-active"{% endif %}>
+                    <i class="fas fa-chart-bar fa-fw mr-2"></i>
+                    <span class="menu-text">New Analysis</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'saas_analyzer:analysis_status' %}" {% if request.resolver_match.url_name == 'analysis_status' %}class="is-active"{% endif %}>
+                    <i class="fas fa-tasks fa-fw mr-2"></i>
+                    <span class="menu-text">Analysis Status</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-question-circle fa-fw mr-2"></i>
+                    <span class="menu-text">Help</span>
+                </a>
+            </li>
+        </ul>
+        
+        {% if recent_projects %}
+        <p class="menu-label">Recent Projects</p>
+        <ul class="menu-list">
+            {% for project in recent_projects %}
+            <li>
+                <a href="{% url 'saas_analyzer:results_with_file' project.slug %}">
+                    <i class="fas fa-folder fa-fw mr-2"></i>
+                    <span class="menu-text">{{ project.name }}</span>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </nav>
+</aside>
+
+<style>
+    /* Responsive Drawer Styles */    /* Side Drawer (Sidebar) */
+   
+    .side-drawer {
+        transition: width 0.3s ease, transform 0.3s ease;
+        overflow-x: hidden;
+        position: fixed;
+	      top: 56px; /* Start below the navbar */
+	      height: calc(100vh - 56px); /* Full height minus navbar */
+        left: 0;
+        background-color: #2D3748;
+        z-index: 1000;
+    }
+     .side-drawer {
+      width: 250px;
+      background-color: #2D3748;
+      color: #ffffff;
+      position: fixed;
+      overflow-y: auto;
+      transition: all 0.3s;
+      z-index: 30;
+    }
+    
+    .side-drawer .menu-label {
+      color: #A0AEC0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 1rem 1.5rem 0.5rem;
+    }
+    
+    .side-drawer .menu-list a {
+      color: #E2E8F0;
+      border-radius: 0.25rem;
+      margin: 0.2rem 0.75rem;
+    }
+    
+    .side-drawer .menu-list a:hover {
+      background-color: #4A5568;
+      color: #ffffff;
+    }
+    
+    .side-drawer .menu-list a.is-active {
+      background-color: #4299E1;
+      color: #ffffff;
+    }
+
+    .side-drawer .drawer-toggle {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .side-drawer .menu-text {
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        white-space: nowrap;
+    }
+
+   .side-drawer {
+        width: 250px;
+        background-color: #2D3748;
+        color: #ffffff;
+        position: fixed;
+        top: 56px;
+        height: calc(100vh - 56px);
+        left: 0;
+        overflow-y: auto;
+        transition: all 0.3s;
+        z-index: 30;
+    }
+
+    /* Collapsed State */
+    .side-drawer.collapsed {
+        width: 70px;
+    }
+
+    .side-drawer.collapsed .menu-text,
+    .side-drawer.collapsed .menu-label {
+        opacity: 0;
+        visibility: hidden;
+        white-space: nowrap;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .side-drawer.collapsed .brand .title {
+        display: none;
+    }
+
+    /* Expanded State */
+    .side-drawer:not(.collapsed) .menu-text,
+    .side-drawer:not(.collapsed) .menu-label {
+        opacity: 1;
+        visibility: visible;
+    }
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const sideDrawer = document.getElementById('sideDrawer');
+    const drawerToggle = document.getElementById('drawerToggle');
+
+    // Initialize state from localStorage
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    sideDrawer.classList.toggle('collapsed', isCollapsed);
+
+    function toggleDrawer() {
+        const isCollapsed = sideDrawer.classList.toggle('collapsed');
+        // localStorage.setItem('sidebarCollapsed', isCollapsed);
+    }
+
+    if (drawerToggle) {
+        drawerToggle.addEventListener('click', toggleDrawer);
+    }
+});
+</script>

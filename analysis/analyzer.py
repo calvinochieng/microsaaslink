@@ -1,14 +1,14 @@
 from decouple import config
-import google.generativeai as genai
+from google import genai
+from google.genai.types import Tool, GenerateContentConfig, GoogleSearch
+import re
+import json
 
-def gen(name, url):
-    genai.configure(api_key=config("GEMINI_API_KEY"))
-    model = genai.GenerativeModel('gemini-2.0-flash')
+def gen(name, url): 
     name = name or None
     url = url or None
-    description = ""
-    
-    input = f"""
+    description = ''
+    prompt = f"""
     INPUT:
     - SaaS Product Name/URL: [NAME: {name}, URL: {url}]
     - SaaS Description: [{description}]
@@ -121,6 +121,7 @@ def gen(name, url):
             }}
         }},
         "microsaas_recommendations": [
+            // Standalone is HIHGHLY PREFFERED
             {{
                 "name": "Product name",
                 "type": "Plugin/Standalone/Integration",
@@ -171,40 +172,131 @@ def gen(name, url):
     - Focus on actionable opportunities with clear market demand
     - Consider both technical feasibility and business viability
     """
-    
-    response = model.generate_content(input)
-    return response.text
+    client = genai.Client(api_key=config("GEMINI_API_KEY"))
+    model_id = "gemini-2.0-flash"
+    google_search_tool = Tool( google_search = GoogleSearch()  )
+
+    response = client.models.generate_content(
+        model=model_id,
+        contents= prompt,
+        config=GenerateContentConfig(
+            tools=[google_search_tool],
+            response_modalities=["TEXT"],
+        )
+    )
+    print(response)
+    print(response.candidates[0].grounding_metadata.web_search_queries)
+    def process_response(response):
+        try:
+            saas_data_json = extract_analysis_data(response)
+            if saas_data_json is None:
+                raise ValueError("Failed to extract analysis data")
+                
+            search_queries = extract_search_queries(response)
+            token_info = extract_token_info(response)
+            
+            return {
+                'saas_data_json': saas_data_json,
+                'search_queries': search_queries,
+                'token_info': token_info
+            }
+        except Exception as e:
+            print(f"Error in process_response: {str(e)}")
+            return None
+
+    processed_data = process_response(response)
+    return processed_data  # Return the processed data
 
 
-#     from decouple import config
-# import google.generativeai as genai
-# import json
+def extract_analysis_data(response):
+    try:
+        # Get the text from the first part
+        json_text = response.text
+        # print("Original text:", json_text[:100] + "...") # Debug print
+        
+        if not isinstance(json_text, str):
+            print(f"Unexpected type: {type(json_text)}")
+            return None
+            
+        # Clean up the JSON text
+        if "```json" in json_text:
+            # Extract content between ```json and ```
+            match = re.search(r'```json\s*(.*?)\s*```', json_text, re.DOTALL)
+            if match:
+                json_text = match.group(1)
+        elif "```" in json_text:
+            # Extract content between ``` and ```
+            match = re.search(r'```\s*(.*?)\s*```', json_text, re.DOTALL)
+            if match:
+                json_text = match.group(1)
+                
+        # Clean up the text
+        json_text = json_text.strip()
+        
+        # Remove single backticks if they exist
+        if json_text.startswith('`') and json_text.endswith('`'):
+            json_text = json_text[1:-1].strip()
+            
+        # print("Cleaned JSON text:", json_text[:100] + "...") # Debug print
+        
+        # Try to parse the JSON
+        try:
+            parsed_data = json.loads(json_text)
+            return parsed_data
+        except json.JSONDecodeError as e:
+            print(f"JSON parsing error: {str(e)}")
+            print("Failed JSON text:", json_text)
+            return None
+            
+    except Exception as e:
+        print(f"Error in extract_analysis_data: {str(e)}")
+        return None
 
-# def gen(name, url):
-#     genai.configure(api_key=config("GEMINI_API_KEY"))
-#     model = genai.GenerativeModel('gemini-2.0-flash')
-#     name = name or None
-#     url = url or None
-#     description = ""
+def extract_search_queries(response):
+    return response.candidates[0].grounding_metadata.web_search_queries
 
-#     input = f"""Is there water in these planets , mar, jupitar, return the item is json
-#     """
+def extract_search_rendered_content(response):
+    return response.candidates[0].grounding_metadata.search_entry_point.rendered_content
 
-#     response = model.generate_content(input)
+def extract_token_info(response):
+    return {
+        'prompt_tokens': response.usage_metadata.prompt_token_count,
+        'candidate_tokens': response.usage_metadata.candidates_token_count,
+        'total_tokens': response.usage_metadata.total_token_count
+    }
 
-#     try:
-#         # Extract the generated text (assuming you want the first candidate)
-#         generated_text = response.candidates[0].text
 
-#         # Parse the JSON string
-#         json_data = json.loads(generated_text)  # This is the crucial step
+def process_response(response):
+    try:
+        saas_data_json = extract_analysis_data(response)
+        if saas_data_json is None:
+            raise ValueError("Failed to extract analysis data")
+            
+        search_queries = extract_search_queries(response)
+        token_info = extract_token_info(response)
+        
+        return {
+            'saas_data_json': saas_data_json,
+            'search_queries': search_queries,
+            'token_info': token_info
+        }
+    except Exception as e:
+        print(f"Error in process_response: {str(e)}")
+        return None
 
-#         return json_data  # Now you have a Python dictionary
 
-#     except (json.JSONDecodeError, IndexError) as e:
-#         print(f"Error: Could not parse JSON or access candidate: {e}")
-#         return {"error": "Could not process the request."}  # Return an error object
 
-# # Example usage (for testing)
-# result = gen(None, None)
-# print(result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+

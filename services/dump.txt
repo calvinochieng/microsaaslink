@@ -1,0 +1,588 @@
+def generate_saas_idea_prompt(target_saas, market_gaps, extensibility_score, extensibility_factors):
+    """
+    Build a single prompt that instructs the AI to generate a micro-SaaS idea.
+    
+    Parameters:
+      target_saas (dict): Contains at least a "description" key describing the target market.
+      market_gaps (list): A list of dicts, each with keys like 'gap', 'severity', 'opportunity_size', and 'explanation'.
+      extensibility_score (int): A score (1-10) indicating how extensible the target platform is.
+      extensibility_factors (list): A list of factors (as strings) that influenced the extensibility score.
+      
+    Returns:
+      str: The unified prompt.
+    """
+    # Create a summary of market gaps
+    gaps_summary = "\n".join(
+        f"{i+1}. {gap['gap']} (Severity: {gap['severity']}, Opportunity: {gap['opportunity_size']})\n   Explanation: {gap['explanation']}"
+        for i, gap in enumerate(market_gaps)
+    )
+
+    # Create extensibility context
+    extensibility_context = (
+        f"PLATFORM EXTENSIBILITY: {extensibility_score}/10\n"
+        f"EXTENSIBILITY FACTORS: {', '.join(extensibility_factors)}"
+    )
+
+    # Unified prompt that includes all details
+    prompt = f"""
+You are a SaaS product strategist tasked with developing a micro-SaaS idea.
+
+TARGET SAAS MARKET:
+{target_saas.get('description', 'No description provided.')}
+
+{extensibility_context}
+
+IDENTIFIED MARKET GAPS:
+{gaps_summary}
+
+TASK:
+Generate one well-validated micro-SaaS product concept based on the above context. Your idea should include:
+1. A compelling name and tagline.
+2. A concise description of the solution.
+3. A clear definition of the target audience.
+4. 4-6 key features addressing the market gaps.
+5. A detailed pricing model with specific price points.
+6. Validation points that explain why the idea would succeed.
+7. An implementation difficulty score (1-10).
+8. An outline of the initial go-to-market strategy.
+9. Potential challenges to overcome.
+
+Please format your response as a clean JSON object with the keys:
+"name", "tagline", "description", "target_audience", "key_features", "pricing_model", "validation", "implementation_difficulty", "go_to_market", "challenges".
+    """
+    return prompt
+
+# Example usage:
+target_saas = {"description": "A project management tool for creative teams."}
+market_gaps = [
+    {
+        "gap": "Lack of integrated creative asset management",
+        "severity": "High",
+        "opportunity_size": "Large",
+        "explanation": "Teams struggle to organize and share visual assets seamlessly within the project management workflow."
+    },
+    {
+        "gap": "Inadequate collaboration tools for remote brainstorming",
+        "severity": "Medium",
+        "opportunity_size": "Moderate",
+        "explanation": "Remote teams need real-time collaboration features beyond standard task management."
+    }
+]
+extensibility_score = 8
+extensibility_factors = ["api (+3)", "integration (+2)", "known extensible platform: slack (score set to 8)"]
+
+prompt = generate_saas_idea_prompt(target_saas, market_gaps, extensibility_score, extensibility_factors)
+print(prompt)
+
+
+
+
+
+
+
+
+
+def generate_micro_saas_ideas(self, max_ideas=3):
+    """Step 5: Generate micro-SaaS ideas based on identified market gaps"""
+    if not self.combined_pain_points:
+        print("Error: Combined pain points analysis not complete. Please combine pain points first.")
+        return None
+
+    print(f"\n{'='*80}\nSTEP 5: GENERATING MICRO-SAAS IDEAS\n{'='*80}")
+
+    # Extract market gaps for the prompt
+    market_gaps = self.combined_pain_points.get('market_gaps', [])
+    if not market_gaps:
+        print("No significant market gaps identified to generate micro-SaaS ideas.")
+        return None
+
+    gaps_summary = ""
+    for i, gap in enumerate(market_gaps, 1):
+        gaps_summary += f"{i}. {gap['gap']} (Severity: {gap['severity']}, Opportunity: {gap['opportunity_size']})\n"
+        gaps_summary += f"   Explanation: {gap['explanation']}\n\n"
+
+    prompt = f"""
+    You are a SaaS product strategist developing micro-SaaS ideas based on identified market gaps.
+    
+    TARGET SAAS MARKET: {self.target_saas['description']}
+
+    IDENTIFIED MARKET GAPS:
+    {gaps_summary}
+    
+    TASK:
+    Generate {max_ideas} well-validated micro-SaaS product concepts based on these market gaps.
+    
+    IMPORTANT:
+    - Before recommending any add-on idea(s), ensure that the target SaaS is open with APIs, supports add-ons, or allows the implementation of a browser extension.
+    - If the target SaaS does not meet these conditions, always recommend a standalone micro-SaaS solution that addresses the identified pain points.
+    - It is acceptable to propose an idea that directly competes by solving a specific market segment more effectively than the target SaaS and its competitors, as described in the combined pain points.
+    - Validate each idea based on its viability, feasibility, adaptability, and alignment with current market trends.
+    
+    For each micro-SaaS idea:
+    1. Create a compelling name and tagline.
+    2. Provide a concise description of the solution.
+    3. Define the specific target audience.
+    4. List 3-5 key features that directly address the market gap.
+    5. Suggest a pricing model.
+    6. Explain why this idea would succeed (include validation points).
+    7. Estimate implementation difficulty (1-10).
+    
+    Format your response as a clean JSON array where each object has keys:
+    "name", "tagline", "description", "target_audience", "key_features", "pricing_model", "validation", "implementation_difficulty".
+      {{
+    "name": "MicroSaaS Name",
+    "tagline": "Compelling tagline for the solution",
+    "description": "A concise description of the solution and its value proposition.",
+    "target_audience": "Define the specific target audience.",
+    "key_features": ["Key Feature 1", "Key Feature 2", "Key Feature 3"],
+    "pricing_model": "Pricing model details, tiers and prices",
+    "validation": "Validation points: viability, feasibility, adaptability, and market trends",
+    "implementation_difficulty": "Estimated difficulty on a scale of 1-10"
+      }}
+
+    
+    Focus on creating highly focused, specialized solutions with a clear value proposition that could be built by a small team.
+    """
+
+    try:
+        response = self._generate_content(prompt)
+        result = self._extract_json(response.text)
+        print(result)
+
+        if result:
+            self.micro_saas_ideas = result
+            self._print_micro_saas_ideas(result)
+            return result
+        else:
+            print("Failed to generate micro-SaaS ideas. Please try again.")
+            return None
+    except Exception as e:
+        print(f"Error in generate_micro_saas_ideas: {str(e)}")
+        return None
+
+
+
+    
+
+
+    def generate_micro_saas_ideas(self, max_ideas=3):
+        """Step 5: Generate micro-SaaS ideas based on identified market gaps,
+        intelligently deciding between standalone solutions and add-ons"""
+        if not self.combined_pain_points:
+            print("Error: Combined pain points analysis not complete. Please combine pain points first.")
+            return None
+            
+        print(f"\n{'='*80}\nSTEP 5: GENERATING MICRO-SAAS IDEAS\n{'='*80}")
+        
+        # Extract market gaps for the prompt
+        market_gaps = self.combined_pain_points.get('market_gaps', [])
+        if not market_gaps:
+            print("No significant market gaps identified to generate micro-SaaS ideas.")
+            return None
+        
+        # Analyze target SaaS for extensibility
+        extensibility_score, extensibility_factors = self._analyze_target_saas_extensibility()
+        
+        print(f"Target SaaS Extensibility Analysis:\n- Score: {extensibility_score}/10\n- Factors: {', '.join(extensibility_factors)}")
+        
+        # Define idea types based on extensibility
+        idea_types = []
+        if extensibility_score >= 7:
+            # Highly extensible - focus on add-ons but include some standalone
+            idea_types = ["add-on", "add-on", "standalone"]
+        elif extensibility_score >= 4:
+            # Moderately extensible - balanced approach
+            idea_types = ["add-on", "standalone", "standalone"]
+        else:
+            # Low extensibility - focus on standalone solutions
+            idea_types = ["standalone", "standalone", "standalone"]
+        
+        # Ensure we don't request more ideas than specified
+        idea_types = idea_types[:max_ideas]
+        
+        # Build gap summary for prompt
+        gaps_summary = ""
+        for i, gap in enumerate(market_gaps, 1):
+            gaps_summary += f"{i}. {gap['gap']} (Severity: {gap['severity']}, Opportunity: {gap['opportunity_size']})\n"
+            gaps_summary += f"   Explanation: {gap['explanation']}\n\n"
+        
+        # Prepare extensibility context for prompt
+        extensibility_context = f"""
+        PLATFORM EXTENSIBILITY: {extensibility_score}/10
+        EXTENSIBILITY FACTORS: {', '.join(extensibility_factors)}
+        RECOMMENDATION: {self._get_extensibility_recommendation(extensibility_score)}
+        """
+        
+        # Generate ideas for each type
+        all_ideas = []
+        for idea_type in idea_types:
+            prompt = self._build_idea_generation_prompt(idea_type, gaps_summary, extensibility_context)
+            
+            try:
+                response = self._generate_content(prompt)
+                result = self._extract_json(response.text)
+                
+                if result:
+                    # Add the type to each idea
+                    for idea in result:
+                        idea['type'] = idea_type
+                    
+                    all_ideas.extend(result)
+                
+            except Exception as e:
+                print(f"Error generating {idea_type} ideas: {str(e)}")
+        
+        if all_ideas:
+            # Validate and improve ideas
+            validated_ideas = self._validate_and_improve_ideas(all_ideas)
+            
+            # Store and print results
+            self.micro_saas_ideas = validated_ideas
+            self._print_micro_saas_ideas(validated_ideas)
+            return validated_ideas
+        else:
+            print("Failed to generate micro-SaaS ideas. Please try again.")
+            return None
+
+    def _analyze_target_saas_extensibility(self):
+        """Analyze the target SaaS description to determine extensibility"""
+        extensibility_score = 5  # Default moderate score
+        extensibility_factors = []
+        
+        # Get target SaaS description
+        description = self.target_saas.get('description', '').lower()
+        
+        # Check for extensibility indicators in description
+        extensibility_indicators = {
+            'api': 3,
+            'developer': 2,
+            'integration': 2,
+            'plugin': 3,
+            'extension': 3,
+            'marketplace': 2,
+            'app store': 3,
+            'ecosystem': 2,
+            'partner': 1,
+            'webhook': 2,
+            'customiz': 1,  # Catches customize/customization
+            'open source': 1
+        }
+        
+        # Check for closed system indicators
+        closed_indicators = {
+            'proprietary': -1,
+            'closed system': -3,
+            'no api': -3,
+            'limited integration': -2,
+            'enterprise only': -1,
+            'security restriction': -1
+        }
+        
+        # Apply scoring based on indicators
+        for term, score in extensibility_indicators.items():
+            if term in description:
+                extensibility_score += score
+                extensibility_factors.append(f"{term} (+{score})")
+        
+        for term, score in closed_indicators.items():
+            if term in description:
+                extensibility_score += score  # Score is negative
+                extensibility_factors.append(f"{term} ({score})")
+        
+        # Check known extensible platforms
+        extensible_platforms = {
+            'wordpress': 9,
+            'shopify': 9,
+            'salesforce': 8,
+            'chrome': 9,
+            'firefox': 8,
+            'slack': 8,
+            'github': 7,
+            'zapier': 8,
+            'trello': 7,
+            'asana': 6,
+            'hubspot': 7
+        }
+        
+        for platform, score in extensible_platforms.items():
+            if platform in description:
+                extensibility_score = max(extensibility_score, score)
+                extensibility_factors.append(f"known extensible platform: {platform} (score set to {score})")
+                break
+        
+        # Cap score within valid range
+        extensibility_score = max(1, min(10, extensibility_score))
+        
+        # If no factors were detected, add a default explanation
+        if not extensibility_factors:
+            extensibility_factors.append("insufficient information (default score)")
+        
+        return extensibility_score, extensibility_factors
+
+    def _get_extensibility_recommendation(self, score):
+        """Get recommendation based on extensibility score"""
+        if score >= 8:
+            return "HIGHLY EXTENSIBLE: Focus on creating add-ons, plugins, or extensions for this platform."
+        elif score >= 6:
+            return "MODERATELY EXTENSIBLE: Consider both add-ons and standalone solutions."
+        elif score >= 4:
+            return "SOMEWHAT EXTENSIBLE: Prioritize standalone solutions but consider lightweight integrations."
+        else:
+            return "LIMITED EXTENSIBILITY: Focus exclusively on standalone alternatives that solve similar problems."
+
+    def _build_idea_generation_prompt(self, idea_type, gaps_summary, extensibility_context):
+        """Build a prompt for idea generation based on type"""
+        
+        # Base prompt structure
+        base_prompt = f"""
+        You are a SaaS product strategist developing micro-SaaS ideas based on identified market gaps.
+        
+        TARGET SAAS MARKET: {self.target_saas['description']}
+        
+        {extensibility_context}
+        
+        IDENTIFIED MARKET GAPS:
+        {gaps_summary}
+        
+        TASK:
+        Generate 1 well-validated {"add-on/plugin" if idea_type == "add-on" else "STANDALONE"} micro-SaaS product concept based on these market gaps.
+        """
+        
+        # Add type-specific instructions
+        if idea_type == "add-on":
+            specific_instructions = """
+            This should be designed as an ADD-ON, PLUGIN, or EXTENSION for the target SaaS platform.
+            Focus on how it integrates with and enhances the existing platform while addressing the identified gaps.
+            """
+        else:  # standalone
+            specific_instructions = """
+            This should be a STANDALONE product that operates independently of the target SaaS platform.
+            Focus on how it can provide a complete solution to the identified gaps without requiring the target platform.
+            Consider how it might interface with or import/export data with the target platform but don't make it dependent.
+            """
+        
+        # Common format instructions
+        format_instructions = """
+        For the micro-SaaS idea:
+        1. Create a compelling name and tagline
+        2. Provide a concise description of the solution
+        3. Define the specific target audience
+        4. List 4-6 key features that directly address the market gap
+        5. Suggest a pricing model with specific price points
+        6. Explain why this would succeed (validation points)
+        7. Estimate implementation difficulty (1-10)
+        8. Outline initial go-to-market strategy
+        9. Identify potential challenges to overcome
+        
+        Format your response as a clean JSON object with keys:
+        "name", "tagline", "description", "target_audience", "key_features", "pricing_model", 
+        "validation", "implementation_difficulty", "go_to_market", "challenges"
+        
+        Focus on creating a highly focused, specialized solution that has a clear value proposition and could be built by a small team.
+        """
+        
+        return base_prompt + specific_instructions + format_instructions
+
+    def _validate_and_improve_ideas(self, ideas):
+        """Validate and improve generated ideas"""
+        validated_ideas = []
+        
+        for idea in ideas:
+            # Calculate viability score
+            viability_score, viability_factors = self._calculate_viability(idea)
+            idea['viability_score'] = viability_score
+            idea['viability_factors'] = viability_factors
+            
+            # Generate improvement suggestions
+            improvements = self._generate_improvements(idea, viability_factors)
+            idea['improvement_suggestions'] = improvements
+            
+            validated_ideas.append(idea)
+        
+        # Sort by viability score
+        validated_ideas = sorted(validated_ideas, key=lambda x: x['viability_score'], reverse=True)
+        
+        return validated_ideas
+
+    def _calculate_viability(self, idea):
+        """Calculate viability score for an idea"""
+        score = 5.0  # Start with neutral score
+        factors = []
+        
+        # Factor 1: Implementation difficulty (weight: high)
+        difficulty = idea.get('implementation_difficulty', 5)
+        difficulty_impact = (10 - difficulty) * 0.3  # Higher score for lower difficulty
+        score += difficulty_impact
+        factors.append(f"Implementation Difficulty: {difficulty}/10 ({difficulty_impact:+.1f})")
+        
+        # Factor 2: Target audience clarity (weight: medium)
+        audience = idea.get('target_audience', '')
+        audience_score = 0
+        if len(audience) > 100:  # Detailed audience description
+            audience_score = 1.0
+        elif len(audience) > 50:  # Moderate audience description
+            audience_score = 0.5
+        score += audience_score
+        factors.append(f"Audience Clarity: {audience_score:+.1f}")
+        
+        # Factor 3: Feature completeness (weight: medium)
+        features = idea.get('key_features', [])
+        feature_count = len(features) if isinstance(features, list) else 0
+        feature_score = min(1.0, feature_count / 5.0)
+        score += feature_score
+        factors.append(f"Feature Completeness: {feature_score:+.1f}")
+        
+        # Factor 4: Pricing model clarity (weight: high)
+        pricing = idea.get('pricing_model', '')
+        pricing_score = 0
+        if '$' in pricing and ('month' in pricing.lower() or 'year' in pricing.lower()):
+            pricing_score = 1.5  # Clear pricing with specific numbers
+        elif 'tier' in pricing.lower() or 'free' in pricing.lower():
+            pricing_score = 1.0  # Has tiers or freemium strategy
+        score += pricing_score
+        factors.append(f"Pricing Clarity: {pricing_score:+.1f}")
+        
+        # Factor 5: Validation strength (weight: high)
+        validation = idea.get('validation', '')
+        validation_score = 0
+        validation_keywords = ['market research', 'competitor', 'trend', 'growing', 'demand', 'gap', 'need', 'problem']
+        for keyword in validation_keywords:
+            if keyword in validation.lower():
+                validation_score += 0.2
+        validation_score = min(1.5, validation_score)
+        score += validation_score
+        factors.append(f"Validation Strength: {validation_score:+.1f}")
+        
+        # Factor 6: Go-to-market clarity (weight: medium)
+        gtm = idea.get('go_to_market', '')
+        gtm_score = 0
+        gtm_keywords = ['channel', 'marketing', 'launch', 'customer', 'acquisition', 'partnership', 'content']
+        for keyword in gtm_keywords:
+            if keyword in gtm.lower():
+                gtm_score += 0.15
+        gtm_score = min(1.0, gtm_score)
+        score += gtm_score
+        factors.append(f"Go-to-Market Clarity: {gtm_score:+.1f}")
+        
+        # Factor 7: Type appropriateness based on extensibility
+        idea_type = idea.get('type', 'standalone')
+        extensibility_score, _ = self._analyze_target_saas_extensibility()
+        
+        type_score = 0
+        if idea_type == 'add-on' and extensibility_score >= 7:
+            type_score = 1.0  # Add-on for highly extensible platform
+        elif idea_type == 'standalone' and extensibility_score <= 4:
+            type_score = 1.0  # Standalone for closed platform
+        elif idea_type == 'add-on' and extensibility_score < 5:
+            type_score = -1.0  # Add-on for relatively closed platform (penalty)
+        score += type_score
+        factors.append(f"Solution Type Appropriateness: {type_score:+.1f}")
+        
+        # Cap final score between 1 and 10
+        final_score = max(1, min(10, score))
+        
+        return final_score, factors
+
+    def _generate_improvements(self, idea, viability_factors):
+        """Generate improvement suggestions based on viability analysis"""
+        improvements = []
+        
+        # Extract scores from factors
+        factor_scores = {}
+        for factor in viability_factors:
+            parts = factor.split(':')
+            if len(parts) >= 2:
+                key = parts[0].strip()
+                value_parts = parts[1].strip().split('(')
+                if len(value_parts) >= 2:
+                    score_text = value_parts[1].replace(')', '').strip()
+                    try:
+                        score = float(score_text)
+                        factor_scores[key] = score
+                    except:
+                        pass
+        
+        # Generate improvements for low-scoring factors
+        if factor_scores.get("Implementation Difficulty", 0) < 0:
+            improvements.append("Consider simplifying the initial feature set to reduce implementation complexity.")
+        
+        if factor_scores.get("Audience Clarity", 0) < 0.5:
+            improvements.append("Define your target audience more specifically, including industry, company size, and key pain points.")
+        
+        if factor_scores.get("Feature Completeness", 0) < 0.8:
+            improvements.append("Expand your feature set to create a more complete solution that fully addresses the identified gap.")
+        
+        if factor_scores.get("Pricing Clarity", 0) < 1.0:
+            improvements.append("Develop a more detailed pricing model with specific price points and tiers.")
+        
+        if factor_scores.get("Validation Strength", 0) < 0.8:
+            improvements.append("Strengthen your validation by providing specific market research data or competitor analysis.")
+        
+        if factor_scores.get("Go-to-Market Clarity", 0) < 0.5:
+            improvements.append("Develop a more detailed go-to-market strategy with specific customer acquisition channels.")
+        
+        if factor_scores.get("Solution Type Appropriateness", 0) < 0:
+            idea_type = idea.get('type', 'standalone')
+            extensibility_score, _ = self._analyze_target_saas_extensibility()
+            
+            if idea_type == 'add-on' and extensibility_score < 5:
+                improvements.append("Consider pivoting to a standalone solution as the target platform has limited extensibility.")
+            elif idea_type == 'standalone' and extensibility_score > 7:
+                improvements.append("Consider developing an add-on version to leverage the target platform's extensive ecosystem.")
+        
+        # If no specific improvements, add a general one
+        if not improvements:
+            if idea.get('viability_score', 5) >= 8:
+                improvements.append("This is a strong concept. Consider creating a simple MVP to validate market interest quickly.")
+            else:
+                improvements.append("Focus on better articulating how this solution addresses the specific pain points identified in the market gap analysis.")
+        
+        return improvements
+
+    def _print_micro_saas_ideas(self, ideas):
+        """Print formatted micro-SaaS ideas with viability scores and improvement suggestions"""
+        print(f"\n{'='*80}\nVALIDATED MICRO-SAAS IDEAS\n{'='*80}")
+        
+        for i, idea in enumerate(ideas, 1):
+            idea_type = idea.get('type', 'unknown').upper()
+            viability_score = idea.get('viability_score', 'N/A')
+            
+            print(f"\n{i}. {idea['name']} ({idea_type}) - Viability: {viability_score}/10")
+            print(f"   Tagline: {idea['tagline']}")
+            print(f"   Description: {idea['description']}")
+            print(f"   Target Audience: {idea['target_audience']}")
+            
+            print("   Key Features:")
+            features = idea.get('key_features', [])
+            if isinstance(features, list):
+                for feature in features:
+                    print(f"    - {feature}")
+            else:
+                print(f"    {features}")
+                
+            print(f"   Pricing Model: {idea['pricing_model']}")
+            print(f"   Validation Points: {idea['validation']}")
+            print(f"   Implementation Difficulty: {idea['implementation_difficulty']}/10")
+            
+            if 'go_to_market' in idea:
+                print(f"   Go-to-Market Strategy: {idea['go_to_market']}")
+                
+            if 'challenges' in idea:
+                print(f"   Challenges to Overcome: {idea['challenges']}")
+            
+            # Print viability factors
+            if 'viability_factors' in idea:
+                print("\n   Viability Analysis:")
+                for factor in idea['viability_factors']:
+                    print(f"    * {factor}")
+            
+            # Print improvement suggestions
+            if 'improvement_suggestions' in idea:
+                print("\n   Improvement Suggestions:")
+                for suggestion in idea['improvement_suggestions']:
+                    print(f"    * {suggestion}")
+
+
+
+
+

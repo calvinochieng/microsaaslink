@@ -128,11 +128,10 @@ saas_data = [
         }
     ]
 
-def index(request):
-    
+def index(request):    
     context = {
         'saas_data': saas_data
-    }
+        }
     
     return render(request, 'index.html', context)
 
@@ -169,7 +168,7 @@ def analysis_export(request, slug):
 
 
 
-    
+
 @login_required
 def analysis(request):
     context = {
@@ -286,44 +285,29 @@ def analysis_api(request):
         return JsonResponse({"form_errors": form_errors}, status=400)
     
     try:
-        result = gen(name, url)  # Assuming this is your analysis function
-        
-        # Clean up the result
-        if isinstance(result, str):
-            # Extract JSON if wrapped in code blocks
-            if "```json" in result:
-                match = re.search(r'```json\n(.*?)\n```', result, re.DOTALL)
-                if match:
-                    result = match.group(1)
-            elif "```" in result:
-                match = re.search(r'```\n(.*?)\n```', result, re.DOTALL)
-                if match:
-                    result = match.group(1)
-            
-            result = result.strip()
-            # Remove any stray backticks
-            if result.startswith('`') and result.endswith('`'):
-                result = result[1:-1].strip()
-        
-        # Parse JSON
-        analysis_data = json.loads(result)
-        
-        # Make sure description exists before using it
-        description = analysis_data.get('description', '')  # Get description from analysis_data
-        
+        response_data = gen(name, url)
+    
+        saas_data_json = response_data['saas_data_json']
+        search_queries = response_data['search_queries']
+        token_info = response_data['token_info']
+        # print(saas_data_json)
+        description = saas_data_json.get('saas_product', {}).get('description', '')
+        # print(description)
+
         # Save analysis result
         analysis = SaaSAnalysis.objects.create(
             user=request.user,
-            product_name=name,
             product_url=url,
+            product_name=name,
+            search_queries = search_queries,
             description=description,
-            analysis_result=analysis_data
+            analysis_result=saas_data_json
         )
         
-        return JsonResponse({
-            "analysis_id": analysis.id,
-            "result": analysis_data
-        }, status=201)  # Using 201 Created for successful resource creation
+        return JsonResponse({ 
+            "slug": analysis.slug,
+            "result": saas_data_json
+        }, status=201) 
         
     except json.JSONDecodeError as e:
         return JsonResponse({

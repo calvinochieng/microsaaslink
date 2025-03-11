@@ -1,0 +1,148 @@
+<!-- templates/saas_analyzer/results.html -->
+{% extends "multianalysis/base.html" %}
+
+{% block title %}SaaS Analysis Results{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <div class="card mt-4">
+                <div class="card-header bg-success text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">SaaS Analysis Results</h3>
+                        <div>
+                            <a href="/saas-analyzer/" class="btn btn-outline-light btn-sm">
+                                <i class="fas fa-home"></i> New Analysis
+                            </a>
+                            <a href="/saas-analyzer/download/{{ result_id }}/" class="btn btn-outline-light btn-sm ms-2">
+                                <i class="fas fa-download"></i> Download JSON
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="analysisResults">
+                        <!-- Target SaaS Information -->
+                        <section id="targetSaasSection" class="mb-4">
+                            <h4>Target SaaS: {{ data.target_saas.name }}</h4>
+                            <div class="card">
+                                <div class="card-body">
+                                    <p><strong>URL:</strong> {% if data.target_saas.url %}<a href="{{ data.target_saas.url }}" target="_blank">{{ data.target_saas.url }}</a>{% else %}N/A{% endif %}</p>
+                                    <p><strong>Description:</strong> {{ data.target_saas.description }}</p>
+                                    <p><strong>Target Audience:</strong> {{ data.target_saas.target_audience }}</p>
+                                    <p><strong>Differential Factor:</strong> {{ data.target_saas.differential_factor }}</p>
+                                    
+                                    <h5 class="mt-3">Pain Points</h5>
+                                    <ul class="list-group">
+                                        {% for point in data.target_saas.pain_points %}
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>{{ point.issue }}</div>
+                                                <span class="badge bg-primary rounded-pill">Severity: {{ point.severity }}/10</span>
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </section>
+                        
+                        <!-- Competitors Section -->
+                        <section id="competitorsSection" class="mb-4">
+                            <h4>Identified Competitors</h4>
+                            <div class="row">
+                                {% for competitor in data.competitors %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">{{ competitor.name }}</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p><strong>URL:</strong> {% if competitor.url %}<a href="{{ competitor.url }}" target="_blank">{{ competitor.url }}</a>{% else %}N/A{% endif %}</p>
+                                            <p><strong>Description:</strong> {{ competitor.description }}</p>
+                                            <p><strong>Target Audience:</strong> {{ competitor.target_audience }}</p>
+                                            
+                                            <h6>Key Features</h6>
+                                            <ul>
+                                                {% for feature in competitor.key_features %}
+                                                <li>{{ feature }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        
+                        <!-- Market Gaps Section -->
+                        <section id="marketGapsSection" class="mb-4">
+                            <h4>Identified Market Gaps</h4>
+                            <div class="row">
+                                {% for gap in data.market_gaps %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-info text-white">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-0">{{ gap.name }}</h5>
+                                                <span class="badge bg-light text-dark">Score: {{ gap.opportunity_score }}/10</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>{{ gap.description }}</p>
+                                            <p><strong>Target Audience:</strong> {{ gap.target_audience }}</p>
+                                            <p><strong>Related Pain Points:</strong> {{ gap.related_pain_points|join(', ') }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        
+                        <!-- Micro-SaaS Ideas Section -->
+                        <section id="microSaasIdeasSection">
+                            <h4>Micro-SaaS Ideas</h4>
+                            {% for idea in data.micro_saas_ideas %}
+                            <div class="card mb-4">
+                                <div class="card-header bg-success text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">{{ idea.name }}</h5>
+                                        <div>
+                                            <span class="badge bg-light text-dark me-2">Development: {{ idea.development_complexity }}/10</span>
+                                            <span class="badge bg-light text-dark">Market: {{ idea.market_potential }}/10</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <p><strong>Description:</strong> {{ idea.description }}</p>
+                                            <p><strong>Target Audience:</strong> {{ idea.target_audience }}</p>
+                                            <p><strong>Value Proposition:</strong> {{ idea.value_proposition }}</p>
+                                            <p><strong>Monetization Strategy:</strong> {{ idea.monetization_strategy }}</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card">
+                                                <div class="card-header">Key Features</div>
+                                                <div class="card-body p-0">
+                                                    <ul class="list-group list-group-flush">
+                                                        {% for feature in idea.key_features %}
+                                                        <li class="list-group-item">{{ feature }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

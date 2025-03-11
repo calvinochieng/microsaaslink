@@ -1,0 +1,284 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SaaS Analysis Dashboard{% endblock %}</title>
+ 
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" >
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'app/styles.css' %}">
+    {% block custom_styles %}{% endblock custom_styles %}
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="83fb281a-fd05-4d48-8543-7ad5161ce835"></script>
+  
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Fixed navbar styles */
+    .navbar.is-fixed-top {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+    }
+    
+    /* Allowance for the fixed navbar (assuming ~4.5rem height) */
+    .main-content {
+
+    transition: width 0.3s ease;
+      flex: 1;
+      margin-left: 70px;
+      width: calc(100% - 70px);
+      position: relative;
+      margin-top: 56px; /* Push content below the navbar */
+    }
+    
+    .page-content {
+      padding: 2rem;
+      background-color: #F7FAFC;
+      flex: 1;
+    }
+    
+
+    
+    /* Navbar and user profile styles */
+    
+    .navbar-item .button.start-project {
+      font-weight: 500;
+    }
+    
+    .user-profile {
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-profile .avatar {
+      margin-right: 0.75rem;
+    }
+    
+    .user-profile .user-info {
+      text-align: right;
+    }
+    
+    .user-profile .user-info .name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .user-profile .user-info .role {
+      color: #718096;
+      font-size: 0.8rem;
+    }
+    
+    /* Additional content styles */
+    .content-title {
+      margin-bottom: 2rem;
+    }
+    
+    .content-title h1 {
+      font-weight: 700;
+      font-size: 1.75rem;
+      color: #2D3748;
+    }
+    
+    .content-title p {
+      color: #718096;
+      font-size: 1rem;
+    }
+    
+    @media screen and (max-width: 1024px) {      
+      .main-content {        
+        margin-left: 70px !important;
+        width: calc(100% - 70px) !important;
+      }
+    }
+    @media screen and (max-width: 768px) {      
+      .main-content {        
+        margin-left: 0px !important;
+        width: calc(100% - 0px) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+    
+    <!-- Top Navbar -->
+    <nav class="navbar is-fixed-top {% if navbar_classes %}{{ navbar_classes }}{% endif %}" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+              <img class="logo" src=" {% static 'app/images/icon.png'%}" alt="microsaalink">
+            </a>
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+        
+        <div id="navMenu" class="navbar-menu">
+            {% block navbar_start %}
+            <div class="navbar-start">
+                <div class="navbar-item">
+                    <div class="control has-icons-left">
+                        <input class="input" type="text" placeholder="{{ search_placeholder|default:'Search projects...' }}">
+                        <span class="icon is-left">
+                            <i class="fas fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+            
+            {% block navbar_end %}
+            <div class="navbar-end">
+                <a href="{% url 'saas_analyzer:results' %}" class="navbar-item is-hidden-desktop {% if request.resolver_match.url_name == 'results' %}is-active{% endif %}">
+                    <i class="fas fa-project-diagram fa-fw mr-2"></i>
+                    <span class="menu-text">Projects</span>
+                </a>
+            
+                <a href="{% url 'saas_analyzer:analyze_saas' %}"  class="navbar-item is-hidden-desktop {% if request.resolver_match.url_name == 'analyze_saas' %}is-active{% endif %}">
+                    <i class="fas fa-chart-bar fa-fw mr-2"></i>
+                    <span class="menu-text">New Analysis</span>
+                </a>
+            
+                <a href="{% url 'saas_analyzer:analysis_status' %}" class="navbar-item is-hidden-desktop {% if request.resolver_match.url_name == 'analysis_status' %}is-active{% endif %}">
+                    <i class="fas fa-tasks fa-fw mr-2"></i>
+                    <span class="menu-text">Analysis Status</span>
+                </a>
+            
+                <a href="/help" class="navbar-item is-hidden-desktop">
+                    <i class="fas fa-question-circle fa-fw mr-2"></i>
+                    <span class="menu-text">Help</span>
+                </a>
+                <div class="navbar-item">
+                    <a href="{{ new_project_url|default:'#' }}" class="button start-project is-link">
+                        <span class="icon">
+                            <i class="fas fa-plus"></i>
+                        </span>
+                        <span>{{ new_project_label|default:'New Project' }}</span>
+                    </a>
+                </div>
+                
+                <div class="navbar-item has-dropdown is-hoverable">
+                    <a class="navbar-link is-arrowless">
+                        <div class="user-profile">
+                            <div class="user-info">
+                                <div class="name">{{ user.get_full_name|default:user.username }}</div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <div class="navbar-dropdown is-right">
+                        <a href="{% url 'index' %}" class="navbar-item">
+                            <span class="icon mr-2"><i class="fas fa-user"></i></span>
+                            Profile
+                        </a>
+                        <a href="{% url 'index' %}" class="navbar-item">
+                            <span class="icon mr-2"><i class="fas fa-cog"></i></span>
+                            Settings
+                        </a>
+                        <hr class="navbar-divider">
+                        <a href="{% url 'account_logout' %}" class="navbar-item">
+                            <span class="icon mr-2"><i class="fas fa-sign-out-alt"></i></span>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </nav>
+     {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="notification is-{{ message.tags }}">
+                {{ message }}
+                <span id="cancel" class="icon has-text-black" style="cursor: pointer;">
+                    <i class="fa fa-times"></i> <!-- Close icon -->
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {%include 'multianalysis/dashboard/aside.html'%}
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Page Content -->
+        <main class="page-content">
+            {% block content %}
+            <div class="content-title">
+                <h1>{% block page_title %}Projects Dashboard{% endblock %}</h1>
+                <p>{% block page_subtitle %}Analyze and manage your SaaS projects{% endblock %}</p>
+            </div>
+            
+            {% block main_content %}
+            <!-- Main content goes here in child templates -->
+            {% endblock %}
+            {% endblock %}
+        </main>
+    </div>
+    
+    <!-- JavaScript -->
+    <!-- Showing the messages etc -->
+    <script>
+        // Select the cancel button
+        const cancel = document.querySelector('#cancel');
+        const messageContainer = document.querySelector('.messages');
+        
+        // Timer to automatically remove the message after 5 seconds
+        let autoRemoveTimer = setTimeout(() => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 5000); // 5000ms = 5 seconds
+
+        // Function to manually remove the message
+        const removeMessage = () => {
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+            clearTimeout(autoRemoveTimer); // Clear the timer to prevent conflicts
+        };
+
+        if (cancel){ cancel.addEventListener('click', removeMessage);}
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Navbar burger toggles the nav menu (independent of the drawer)
+        const navBurger = document.querySelector('.navbar-burger');
+        if (navBurger) {
+          navBurger.addEventListener('click', () => {
+            const targetId = navBurger.dataset.target;
+            const navMenu = document.getElementById(targetId);
+            navBurger.classList.toggle('is-active');
+            navMenu.classList.toggle('is-active');
+          });
+        }
+        
+        // If you have a separate button to toggle the side drawer on mobile, add its logic here.
+        // For example, if you add an element with id="drawerToggle", you could do:
+        const drawerToggle = document.getElementById('drawerToggle');
+        const sideDrawer = document.getElementById('sideDrawer');
+        if (drawerToggle) {
+          drawerToggle.addEventListener('click', () => {
+            sideDrawer.classList.toggle('is-active');
+          });
+        }
+      });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

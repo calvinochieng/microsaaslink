@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
     # Local Apps
-    'app'
+    'app',
+    'multianalysis',
 ]
 
 

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS Analysis Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .module-card {
+      height: 100%;
+      transition: all 0.3s;
+    }
+    .module-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .module-card.is-locked {
+      opacity: 0.7;
+    }
+    .module-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    .progress-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .progress-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+    .progress-step::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: -50%;
+      width: 100%;
+      height: 3px;
+      background-color: #dbdbdb;
+      z-index: 0;
+    }
+    .progress-step:first-child::before {
+      display: none;
+    }
+    .progress-step.is-active .step-circle {
+      background-color: #3273dc;
+    }
+    .progress-step.is-completed .step-circle {
+      background-color: #23d160;
+    }
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #dbdbdb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      z-index: 1;
+    }
+    .tabs li.is-active a {
+      border-bottom-color: #3273dc;
+      color: #3273dc;
+    }
+    .tag.is-status {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .panel {
+      height: 100%;
+    }
+    .navbar-item img {
+      max-height: 2.5rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar is-light" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="#">
+        <span class="has-text-weight-bold is-size-4 has-text-primary">SaaS<span class="has-text-info">Scout</span></span>
+      </a>
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start">
+        <a class="navbar-item is-active">
+          Dashboard
+        </a>
+        <a class="navbar-item">
+          Projects
+        </a>
+        <a class="navbar-item">
+          Templates
+        </a>
+        <a class="navbar-item">
+          Reports
+        </a>
+      </div>
+      <div class="navbar-end">
+        <div class="navbar-item">
+          <div class="buttons">
+            <a class="button is-primary">
+              <strong>New Project</strong>
+            </a>
+            <a class="button is-light">
+              Help
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <!-- Project Header -->
+      <div class="level">
+        <div class="level-left">
+          <div class="level-item">
+            <h1 class="title">Synthesia Analysis Project</h1>
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <div class="buttons">
+              <button class="button is-info">
+                <span class="icon is-small">
+                  <i class="fas fa-save"></i>
+                </span>
+                <span>Save Project</span>
+              </button>
+              <button class="button is-success">
+                <span class="icon is-small">
+                  <i class="fas fa-file-export"></i>
+                </span>
+                <span>Export Analysis</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Indicator -->
+      <div class="progress-indicator">
+        <div class="progress-step is-completed">
+          <div class="step-circle">
+            <i class="fas fa-check"></i>
+          </div>
+          <span class="is-size-7">SaaS Profile</span>
+        </div>
+        <div class="progress-step is-completed">
+          <div class="step-circle">
+            <i class="fas fa-check"></i>
+          </div>
+          <span class="is-size-7">Competitors</span>
+        </div>
+        <div class="progress-step is-active">
+          <div class="step-circle">3</div>
+          <span class="is-size-7">Pain Points</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle">4</div>
+          <span class="is-size-7">Market Gaps</span>
+        </div>
+        <div class="progress-step">
+          <div class="step-circle">5</div>
+          <span class="is-size-7">Recommendations</span>
+        </div>
+      </div>
+
+      <!-- Module Tabs -->
+      <div class="tabs is-boxed">
+        <ul>
+          <li>
+            <a>
+              <span class="icon is-small"><i class="fas fa-info-circle"></i></span>
+              <span>SaaS Profile</span>
+              <span class="tag is-success is-small ml-2">Complete</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span class="icon is-small"><i class="fas fa-chess"></i></span>
+              <span>Competitors</span>
+              <span class="tag is-success is-small ml-2">Complete</span>
+            </a>
+          </li>
+          <li class="is-active">
+            <a>
+              <span class="icon is-small"><i class="fas fa-exclamation-triangle"></i></span>
+              <span>Pain Points</span>
+              <span class="tag is-warning is-small ml-2">In Progress</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span class="icon is-small"><i class="fas fa-chart-pie"></i></span>
+              <span>Market Gaps</span>
+              <span class="tag is-light is-small ml-2">Locked</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <span class="icon is-small"><i class="fas fa-lightbulb"></i></span>
+              <span>MicroSaaS Ideas</span>
+              <span class="tag is-light is-small ml-2">Locked</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Current Module Content: Pain Points Analysis -->
+      <div class="box">
+        <h2 class="title is-4">User Pain Points</h2>
+        <p class="subtitle is-6">Identify and catalog user pain points for Synthesia</p>
+        
+        <!-- Pain Points List -->
+        <div class="panel">
+          <!-- Controls -->
+          <div class="level">
+            <div class="level-left">
+              <div class="level-item">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input class="input" type="text" placeholder="Search pain points">
+                  </div>
+                  <div class="control">
+                    <a class="button is-info">
+                      Search
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="level-right">
+              <div class="level-item">
+                <button class="button is-primary">
+                  <span class="icon is-small">
+                    <i class="fas fa-plus"></i>
+                  </span>
+                  <span>Add Pain Point</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pain Points Table -->
+          <div class="table-container">
+            <table class="table is-fullwidth is-hoverable">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Pain Point</th>
+                  <th>Severity</th>
+                  <th>Affected Segments</th>
+                  <th>Sources</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <span class="tag is-info">Personalization</span>
+                  </td>
+                  <td>Limited ability to create fully customized avatars that match brand identity</td>
+                  <td>
+                    <span class="tag is-danger">High</span>
+                  </td>
+                  <td>Marketing teams, Brand managers</td>
+                  <td>
+                    <span class="tag is-light">G2 (3)</span>
+                    <span class="tag is-light">Reddit (5)</span>
+                  </td>
+                  <td>
+                    <div class="buttons are-small">
+                      <button class="button is-light">
+                        <span class="icon is-small">
+                          <i class="fas fa-edit"></i>
+                        </span>
+                      </button>
+                      <button class="button is-light">
+                        <span class="icon is-small">
+                          <i class="fas fa-trash"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag is-info">Performance</span>
+                  </td>
+                  <td>Occasional unnatural movements, expressions or voice inflections</td>
+                  <td>
+                    <span class="tag is-warning">Medium</span>
+                  </td>
+                  <td>Professional content creators, Enterprise clients</td>
+                  <td>
+                    <span class="tag is-light">Capterra (7)</span>
+                    <span class="tag is-light">Twitter (4)</span>
+                  </td>
+                  <td>
+                    <div class="buttons are-small">
+                      <button class="button is-light">
+                        <span class="icon is-small">
+                          <i class="fas fa-edit"></i>
+                        </span>
+                      </button>
+                      <button class="button is-light">
+                        <span class="icon is-small">
+                          <i class="fas fa-trash"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="tag is-info">Integration</span>
+                  </td>
+                  <td>Limited integration with existing content management systems and marketing tools</td>
+                  <td>
+                    <span class="tag is-danger">High</span>
+                  </td>
+                  <td>Marketing teams, Enterprise users</td>
+                  <td>
+                    <span class="tag is-light">Interviews (3)</span>
+                    <span class="tag is-light">G2 (8)</span>
+                  </td>
+                  <td>
+                    <div class="buttons are-small">
+                      <button class="button is-light">
+                        <span class="icon is-small">
+                          <i class="fas fa-edit"></i>
+                        </span>
+                      </button>
+                      <button class="button is-light">
+                        <span class="icon is-small">
+                          <i class="fas fa-trash"></i>
+                        </span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pain Point Addition Form -->
+        <div class="box mt-5">
+          <h3 class="title is-5">Add New Pain Point</h3>
+          
+          <div class="field">
+            <label class="label">Category</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select>
+                  <option>Personalization</option>
+                  <option>Performance</option>
+                  <option>Integration</option>
+                  <option>UX/UI</option>
+                  <option>Pricing</option>
+                  <option>Technical Support</option>
+                  <option>Feature Limitations</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Pain Point Description</label>
+            <div class="control">
+              <textarea class="textarea" placeholder="Describe the pain point in detail"></textarea>
+            </div>
+          </div>
+          
+          <div class="columns">
+            <div class="column">
+              <div class="field">
+                <label class="label">Severity</label>
+                <div class="control">
+                  <div class="select is-fullwidth">
+                    <select>
+                      <option>Low</option>
+                      <option>Medium</option>
+                      <option>High</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="column">
+              <div class="field">
+                <label class="label">Frequency</label>
+                <div class="control">
+                  <input class="input" type="text" placeholder="E.g. 23% of reviews">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Affected User Segments</label>
+            <div class="control">
+              <input class="input" type="text" placeholder="E.g. Marketing teams, SMBs, Content creators">
+            </div>
+          </div>
+          
+          <div class="field">
+            <label class="label">Evidence</label>
+            <div class="control">
+              <textarea class="textarea" placeholder="Provide quotes and sources that document this pain point"></textarea>
+            </div>
+          </div>
+          
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-primary">Add Pain Point</button>
+            </div>
+            <div class="control">
+              <button class="button is-light">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="level mt-5">
+        <div class="level-left">
+          <div class="level-item">
+            <button class="button">
+              <span class="icon is-small">
+                <i class="fas fa-arrow-left"></i>
+              </span>
+              <span>Back to Competitors</span>
+            </button>
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <button class="button is-primary">
+              <span>Continue to Market Gaps</span>
+              <span class="icon is-small">
+                <i class="fas fa-arrow-right"></i>
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Project Dashboard Modal (Hidden) -->
+  <div class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Project Dashboard</p>
+        <button class="delete" aria-label="close"></button>
+      </header>
+      <section class="modal-card-body">
+        <div class="columns is-multiline">
+          <!-- SaaS Profile Module Card -->
+          <div class="column is-one-third">
+            <div class="card module-card">
+              <div class="card-content has-text-centered">
+                <span class="icon module-icon has-text-info">
+                  <i class="fas fa-info-circle"></i>
+                </span>
+                <p class="title is-5">SaaS Profile</p>
+                <p class="subtitle is-6">Basic information about Synthesia</p>
+                <span class="tag is-success tag is-status">Complete</span>
+              </div>
+              <footer class="card-footer">
+                <a class="card-footer-item">View</a>
+                <a class="card-footer-item">Edit</a>
+              </footer>
+            </div>
+          </div>
+          
+          <!-- Other modules would follow similar pattern -->
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // JavaScript functionality would go here
+    // For a static mockup, no functionality is implemented
+  </script>
+</body>
+</html>

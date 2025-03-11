@@ -1,0 +1,604 @@
+{%extend 'mutlianalysis/dashboard.html'%}
+{% load static %}
+
+  {% block custom_styles %}
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+    }
+    /* Custom spacing */
+    .mt-6 { margin-top: 1.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .is-fullwidth { width: 100%; }
+    /* Hidden utility */
+    .is-hidden { display: none !important; }
+    
+    /* Stepper styling */
+    .steps {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      margin-bottom: 1.5rem;
+    }
+    .steps li {
+      flex: 1;
+      text-align: center;
+      padding: 0.5rem;
+      border-bottom: 2px solid #ddd;
+      cursor: pointer;
+    }
+    .steps li.step-primary {
+      border-color: #00d1b2; /* primary color */
+      font-weight: bold;
+    }
+    .steps li.locked {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .steps li a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+  {% endblock custom_styles %}
+ {%block content}
+
+    <section class="section">
+      <div class="container">
+        <div class="card">
+          <div class="card-content">
+            <h2 class="title has-text-primary">Step-by-Step SaaS Analysis</h2>
+            
+            <!-- Stepper Tabs -->
+            <div id="stepperContainer" class="mt-6">
+              <ul class="steps mb-8">
+                <li class="step step-primary" data-step="1" id="step1Indicator"><a href="#" data-step="1">Analyze Target</a></li>
+                <li class="step locked" data-step="2" id="step2Indicator"><a href="#" data-step="2">Identify Competitors</a></li>
+                <li class="step locked" data-step="3" id="step3Indicator"><a href="#" data-step="3">Pain Points</a></li>
+                <li class="step locked" data-step="4" id="step4Indicator"><a href="#" data-step="4">Market Gaps</a></li>
+                <li class="step locked" data-step="5" id="step5Indicator"><a href="#" data-step="5">Micro-SaaS Ideas</a></li>
+              </ul>
+              
+              <!-- Step 1: Analyze Target SaaS -->
+              <div class="step-content" id="step1Content">
+                <h3 class="subtitle is-4">Step 1: Analyze Target SaaS</h3>
+                <!-- Action (form) container -->
+                <div id="step1FormContainer">
+                  <form id="targetSaasForm">
+                    <div class="field">
+                      <label class="label">SaaS Product Name</label>
+                      <div class="control">
+                        <input type="text" id="targetSaasName" class="input" required>
+                      </div>
+                    </div>
+                    <div class="field">
+                      <label class="label">SaaS Product URL (optional)</label>
+                      <div class="control">
+                        <input type="url" id="targetSaasUrl" class="input">
+                      </div>
+                    </div>
+                    <div class="field">
+                      <div class="control">
+                        <button type="submit" class="button is-primary is-fullwidth">
+                          <span class="icon"><i class="fas fa-search"></i></span>
+                          <span>Analyze Target SaaS</span>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <!-- Result container -->
+                <div id="targetSaasResult" class="is-hidden"></div>
+              </div>
+              
+              <!-- Step 2: Identify Competitors -->
+              <div class="step-content is-hidden" id="step2Content">
+                <h3 class="subtitle is-4">Step 2: Identify Competitors</h3>
+                <!-- Action container -->
+                <div id="step2ActionContainer">
+                  <button id="identifyCompetitorsBtn" class="button is-primary is-fullwidth">
+                    <span class="icon"><i class="fas fa-search-plus"></i></span>
+                    <span>Identify Competitors</span>
+                  </button>
+                </div>
+                <!-- Result container -->
+                <div id="competitorsResult" class="box mb-4 is-hidden"></div>
+              </div>
+              
+              <!-- Step 3: Analyze Pain Points -->
+              <div class="step-content is-hidden" id="step3Content">
+                <h3 class="subtitle is-4">Step 3: Analyze Competitor Pain Points</h3>
+                <!-- Action container -->
+                <div id="step3ActionContainer">
+                  <button id="analyzePainPointsBtn" class="button is-primary is-fullwidth">
+                    <span class="icon"><i class="fas fa-chart-line"></i></span>
+                    <span>Analyze Pain Points</span>
+                  </button>
+                </div>
+                <!-- Result container -->
+                <div id="painPointsResult" class="box mb-4 is-hidden"></div>
+              </div>
+              
+              <!-- Step 4: Identify Market Gaps -->
+              <div class="step-content is-hidden" id="step4Content">
+                <h3 class="subtitle is-4">Step 4: Identify Market Gaps</h3>
+                <!-- Action container -->
+                <div id="step4ActionContainer">
+                  <button id="identifyGapsBtn" class="button is-primary is-fullwidth">
+                    <span class="icon"><i class="fas fa-search-location"></i></span>
+                    <span>Identify Market Gaps</span>
+                  </button>
+                </div>
+                <!-- Result container -->
+                <div id="marketGapsResult" class="box mb-4 is-hidden"></div>
+              </div>
+              
+              <!-- Step 5: Generate Micro-SaaS Ideas -->
+              <div class="step-content is-hidden" id="step5Content">
+                <h3 class="subtitle is-4">Step 5: Generate Micro-SaaS Ideas</h3>
+                <!-- Action container -->
+                <div id="step5ActionContainer">
+                  <button id="generateIdeasBtn" class="button is-primary is-fullwidth">
+                    <span class="icon"><i class="fas fa-lightbulb"></i></span>
+                    <span>Generate Micro-SaaS Ideas</span>
+                  </button>
+                  <div class="field">
+                    <label class="label">Number of Ideas to Generate</label>
+                    <div class="control">
+                      <div class="select is-fullwidth">
+                        <select id="ideaCount">
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3" selected>3</option>
+                          <option value="5">5</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Result container -->
+                <div id="ideasResult" class="box mb-4 is-hidden"></div>
+              </div>
+              
+              <!-- Results (Final summary) -->
+              <div class="step-content is-hidden" id="resultsContent">
+                <h3 class="subtitle is-4">Analysis Results</h3>
+                <div id="microSaasIdeasInfo" class="box mb-4">
+                  <!-- Micro-SaaS ideas will be displayed here -->
+                </div>
+                <div class="buttons">
+                  <button id="saveResultsBtn" class="button is-success is-fullwidth">
+                    <span class="icon"><i class="fas fa-save"></i></span>
+                    <span>Save Analysis Results</span>
+                  </button>
+                  <a href="/saas-analyzer/" class="button is-outlined is-primary is-fullwidth">
+                    <span class="icon"><i class="fas fa-redo"></i></span>
+                    <span>Start New Analysis</span>
+                  </a>
+                </div>
+              </div>
+              
+              <!-- Processing Indicator -->
+              <div id="processingIndicator" class="has-text-centered is-hidden">
+                <span class="icon is-large">
+                  <i class="fas fa-spinner fa-pulse fa-2x"></i>
+                </span>
+                <p class="mt-4">Processing your request. This may take a moment...</p>
+              </div>
+            </div>
+          </div><!-- end card-content -->
+        </div><!-- end card -->
+      </div><!-- end container -->
+    </section>
+
+ {%endblock content%}
+
+{%block scripts%}
+  <script>
+    // Helper functions to disable/enable a button and show loading text
+    function disableButton(button, loadingMessage) {
+      if (!button.dataset.originalText) {
+        button.dataset.originalText = button.innerHTML;
+      }
+      button.innerHTML = `<span class="icon"><i class="fas fa-spinner fa-pulse"></i></span> <span>${loadingMessage}</span>`;
+      button.disabled = true;
+    }
+
+    function enableButton(button) {
+      if (button.dataset.originalText) {
+        button.innerHTML = button.dataset.originalText;
+      }
+      button.disabled = false;
+    }
+
+    // Track the highest unlocked step (starting at 1)
+    let maxUnlockedStep = 1;
+
+    // Add click event listeners to the stepper tabs
+    document.querySelectorAll('.steps li a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const stepNum = parseInt(this.getAttribute('data-step'));
+        if (stepNum <= maxUnlockedStep) {
+          moveToStep('step' + stepNum);
+        } else {
+          alert('This step is locked. Complete previous steps first.');
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize from URL parameters if provided
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('name')) {
+        document.getElementById('targetSaasName').value = urlParams.get('name');
+      }
+      if (urlParams.has('url')) {
+        document.getElementById('targetSaasUrl').value = urlParams.get('url');
+      }
+      
+      // Step 1: Target SaaS Analysis
+      document.getElementById('targetSaasForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        disableButton(submitBtn, "Analyzing...");
+        
+        fetch('/saas-analyzer/analyze-step/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            step: 'step1',
+            saas_name: document.getElementById('targetSaasName').value,
+            saas_url: document.getElementById('targetSaasUrl').value
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            const targetInfo = data.result;
+            const infoHtml = `
+              <div>
+                <h4 class="title is-5">${targetInfo.name}</h4>
+                <p><strong>URL:</strong> ${targetInfo.url || 'N/A'}</p>
+                <p><strong>Description:</strong> ${targetInfo.description}</p>
+                <p><strong>Target Audience:</strong> ${targetInfo.target_audience.join(', ')}</p>
+                <p><strong>Differential Factor:</strong> ${targetInfo.differential_factor}</p>
+                <div class="mt-4">
+                  <h5 class="subtitle is-6">Pain Points:</h5>
+                  <ul>
+                    ${targetInfo.pain_points.map(p => `<li>${p.issue} <span class="tag">${p.severity}/10</span></li>`).join('')}
+                  </ul>
+                </div>
+              </div>
+            `;
+            // Hide the form and show the result in Step 1
+            document.getElementById('step1FormContainer').classList.add('is-hidden');
+            document.getElementById('targetSaasResult').innerHTML = infoHtml;
+            document.getElementById('targetSaasResult').classList.remove('is-hidden');
+            // Unlock next step (Step 2)
+            maxUnlockedStep = Math.max(maxUnlockedStep, 2);
+            unlockStepTab(2);
+            moveToStep('step2');
+          } else {
+            alert('Error: ' + (data.error || 'Failed to analyze target SaaS'));
+            enableButton(submitBtn);
+          }
+          hideProcessing();
+        })
+        .catch(error => {
+          hideProcessing();
+          alert('Error: ' + error.message);
+          enableButton(submitBtn);
+        });
+      });
+      
+      // Step 2: Identify Competitors
+      document.getElementById('identifyCompetitorsBtn').addEventListener('click', function() {
+        const btn = this;
+        disableButton(btn, "Identifying...");
+        
+        fetch('/saas-analyzer/analyze-step/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'step2' })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            const competitors = data.result;
+            let competitorsHtml = '<h4 class="title is-5">Identified Competitors</h4>';
+            competitors.forEach((comp, index) => {
+              competitorsHtml += `
+                <div class="content ${index < competitors.length - 1 ? 'has-border-bottom' : ''}">
+                  <h5 class="subtitle is-6">${comp.name}</h5>
+                  <p><strong>URL:</strong> ${comp.url || 'N/A'}</p>
+                  <p><strong>Description:</strong> ${comp.description}</p>
+                  <p><strong>Target Audience:</strong> ${(comp.target_audience || []).join(', ') || 'None'}</p>
+                  <p><strong>Differential Factor:</strong> ${comp.differential_factor}</p>
+                </div>
+              `;
+            });
+            // Hide the action button and display the competitors result
+            document.getElementById('step2ActionContainer').classList.add('is-hidden');
+            document.getElementById('competitorsResult').innerHTML = competitorsHtml;
+            document.getElementById('competitorsResult').classList.remove('is-hidden');
+            maxUnlockedStep = Math.max(maxUnlockedStep, 3);
+            unlockStepTab(3);
+            moveToStep('step3');
+          } else {
+            alert('Error: ' + (data.error || 'Failed to identify competitors'));
+            enableButton(btn);
+          }
+          hideProcessing();
+        })
+        .catch(error => {
+          hideProcessing();
+          alert('Error: ' + error.message);
+          enableButton(btn);
+        });
+      });
+      
+      // Step 3: Analyze Pain Points
+      document.getElementById('analyzePainPointsBtn').addEventListener('click', function() {
+        const btn = this;
+        disableButton(btn, "Analyzing...");
+        
+        fetch('/saas-analyzer/analyze-step/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'step3' })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            let painPointsHtml = '<h4 class="title is-5">Common Pain Points</h4><div>';
+            for (const competitorName in data.result) {
+              painPointsHtml += `<div class="box">
+                <h5 class="subtitle is-6">${competitorName}</h5>`;
+              const painPointsArray = data.result[competitorName];
+              if (Array.isArray(painPointsArray)) {
+                painPointsArray.forEach(point => {
+                  painPointsHtml += `
+                    <div class="box">
+                      <div class="level">
+                        <div class="level-left">
+                          <div class="level-item"><strong>${point.issue}</strong></div>
+                        </div>
+                        <div class="level-right">
+                          <div class="level-item"><span class="tag is-info">Frequency: ${point.frequency}</span></div>
+                        </div>
+                      </div>
+                      <p>Addressed: ${point.being_addressed}</p>
+                      <p><strong>Severity:</strong> <span class="tag">${point.severity}/10</span></p>
+                    </div>
+                  `;
+                });
+              } else {
+                console.error(`Pain points for competitor ${competitorName} are not an array:`, painPointsArray);
+              }
+              painPointsHtml += `</div>`;
+            }
+            painPointsHtml += '</div>';
+            // Hide the action container and show the pain points result
+            document.getElementById('step3ActionContainer').classList.add('is-hidden');
+            document.getElementById('painPointsResult').innerHTML = painPointsHtml;
+            document.getElementById('painPointsResult').classList.remove('is-hidden');
+            maxUnlockedStep = Math.max(maxUnlockedStep, 4);
+            unlockStepTab(4);
+            moveToStep('step4');
+          } else {
+            alert('Error: ' + (data.error || 'Failed to analyze pain points'));
+            enableButton(btn);
+          }
+          hideProcessing();
+        })
+        .catch(error => {
+          hideProcessing();
+          alert('Error: ' + error.message);
+          enableButton(btn);
+        });
+      });
+      
+      // Step 4: Identify Market Gaps
+      document.getElementById('identifyGapsBtn').addEventListener('click', function() {
+        const btn = this;
+        disableButton(btn, "Identifying...");
+        
+        fetch('/saas-analyzer/analyze-step/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'step4' })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            const result = data.result;
+            const patterns = result.patterns;
+            const marketGaps = result.market_gaps;
+            let patternsHtml = '<h4 class="title is-5">Identified Patterns</h4><div>';
+            if (Array.isArray(patterns)) {
+              patterns.forEach((pattern, index) => {
+                patternsHtml += `
+                  <div class="box">
+                    <h5 class="subtitle is-6">Pattern #${index + 1}: ${pattern.category}</h5>
+                    <p>${pattern.description}</p>
+                    <p><strong>Examples:</strong> ${(pattern.examples || []).join(', ')}</p>
+                    <p><strong>Prevalence:</strong> ${pattern.prevalence}</p>
+                  </div>
+                `;
+              });
+            } else {
+              console.error("patterns is not an array:", patterns);
+            }
+            patternsHtml += '</div>';
+            
+            let gapsHtml = '<h4 class="title is-5">Identified Market Gaps</h4><div>';
+            if (Array.isArray(marketGaps)) {
+              marketGaps.forEach((gap, index) => {
+                gapsHtml += `
+                  <div class="box">
+                    <h5 class="subtitle is-6">Gap #${index + 1}: ${gap.gap}</h5>
+                    <span class="tag is-warning">Severity: ${gap.severity}/10</span>
+                    <p><strong>Opportunity Size:</strong> ${gap.opportunity_size}</p>
+                    <p><strong>Explanation:</strong> ${gap.explanation}</p>
+                  </div>
+                `;
+              });
+            } else {
+              console.error("market_gaps is not an array:", marketGaps);
+            }
+            gapsHtml += '</div>';
+            
+            // Combine the patterns and gaps results and show them
+            const marketGapsResultHtml = patternsHtml + gapsHtml;
+            document.getElementById('step4ActionContainer').classList.add('is-hidden');
+            document.getElementById('marketGapsResult').innerHTML = marketGapsResultHtml;
+            document.getElementById('marketGapsResult').classList.remove('is-hidden');
+            maxUnlockedStep = Math.max(maxUnlockedStep, 5);
+            unlockStepTab(5);
+            moveToStep('step5');
+          } else {
+            alert('Error: ' + (data.error || 'Failed to identify market gaps'));
+            enableButton(btn);
+          }
+          hideProcessing();
+        })
+        .catch(error => {
+          hideProcessing();
+          alert('Error: ' + error.message);
+          enableButton(btn);
+        });
+      });
+      
+      // Step 5: Generate Micro-SaaS Ideas
+      document.getElementById('generateIdeasBtn').addEventListener('click', function() {
+        const btn = this;
+        disableButton(btn, "Generating...");
+        const ideaCount = document.getElementById('ideaCount').value;
+        
+        fetch('/saas-analyzer/analyze-step/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'step5', idea_count: ideaCount })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            const ideas = data.result;
+            let ideasHtml = '<h4 class="title is-5">Generated Micro-SaaS Ideas</h4><div>';
+            ideas.forEach((idea, index) => {
+              ideasHtml += `
+                <div class="card">
+                  <div class="card-content">
+                    <h5 class="title is-6 has-text-success">Idea #${index + 1}: ${idea.name}</h5>
+                    <p><strong>Description:</strong> ${idea.description}</p>
+                    <p><strong>Target Audience:</strong> ${idea.target_audience}</p>
+                    <div>
+                      <p><strong>Key Features:</strong></p>
+                      <ul>
+                        ${idea.key_features.map(feature => `<li>${feature}</li>`).join('')}
+                      </ul>
+                    </div>
+                    <div>
+                      <p><strong>Pricing Model:</strong> ${idea.pricing_model}</p>
+                    </div>
+                    <div>
+                      <p><strong>Validation:</strong> ${idea.validation}</p>
+                    </div>
+                    <div>
+                      <span class="tag">Implementation Difficulty: ${idea.implementation_difficulty}/10</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+            });
+            ideasHtml += '</div>';
+            document.getElementById('step5ActionContainer').classList.add('is-hidden');
+            document.getElementById('ideasResult').innerHTML = ideasHtml;
+            document.getElementById('ideasResult').classList.remove('is-hidden');
+            // Optionally, move to a final results tab if desired.
+            moveToStep('results');
+          } else {
+            alert('Error: ' + (data.error || 'Failed to generate micro-SaaS ideas'));
+            enableButton(btn);
+          }
+          hideProcessing();
+        })
+        .catch(error => {
+          hideProcessing();
+          alert('Error: ' + error.message);
+          enableButton(btn);
+        });
+      });
+      
+      // Save Results
+      document.getElementById('saveResultsBtn').addEventListener('click', function() {
+        const btn = this;
+        disableButton(btn, "Saving...");
+        
+        fetch('/saas-analyzer/save-results/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ step: 'final' })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            alert('Analysis results saved successfully!');
+            window.location.href = `/saas-analyzer/results/${data.result_file}/`;
+          } else {
+            alert('Error: ' + (data.error || 'Failed to save results'));
+            enableButton(btn);
+          }
+          hideProcessing();
+        })
+        .catch(error => {
+          hideProcessing();
+          alert('Error: ' + error.message);
+          enableButton(btn);
+        });
+      });
+    });
+    
+    // Helper function to move to a given step
+    function moveToStep(stepId) {
+      document.querySelectorAll('.step-content').forEach(el => {
+        el.classList.add('is-hidden');
+      });
+      // If moving to final results, use the "resultsContent" container.
+      if(stepId === 'results'){
+        document.getElementById('resultsContent').classList.remove('is-hidden');
+      } else {
+        document.getElementById(stepId + 'Content').classList.remove('is-hidden');
+      }
+      // Update stepper: mark all steps up to the current as primary
+      const stepNum = parseInt(stepId.replace('step', '')) || 6;
+      document.querySelectorAll('.steps li').forEach((step, index) => {
+        const currentStepNum = index + 1;
+        if (currentStepNum <= stepNum) {
+          step.classList.add('step-primary');
+        } else {
+          step.classList.remove('step-primary');
+        }
+      });
+    }
+    
+    // Helper function to unlock a step's tab visually
+    function unlockStepTab(stepNumber) {
+      const stepTab = document.querySelector('.steps li[data-step="' + stepNumber + '"]');
+      if (stepTab) {
+        stepTab.classList.remove('locked');
+      }
+    }
+    
+    function showProcessing() {
+      document.getElementById('processingIndicator').classList.remove('is-hidden');
+    }
+    
+    function hideProcessing() {
+      document.getElementById('processingIndicator').classList.add('is-hidden');
+    }
+  </script>
+{%endblock scripts%}

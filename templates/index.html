@@ -29,7 +29,7 @@
     .navbar {
       backdrop-filter: blur(10px);
       background-color: rgba(255, 255, 255, 0.8) !important;
-      position: fixed;
+/*      position: fixed;*/
       width: 100%;
       z-index: 100;
     }
@@ -58,7 +58,7 @@
     }
 
     .hero-body {
-      padding: 12rem 1.5rem 6rem !important;
+/*      padding: 12rem 1.5rem 6rem !important;*/
       position: relative;
     }
 
@@ -69,7 +69,7 @@
     }
 
     .hero .title {
-      font-size: 3.5rem;
+      font-size: 2.8rem;
       background: linear-gradient(to right, #fff, #f0f0f0);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -159,13 +159,13 @@
 {% block content %}
 
 
-<section class="hero">
+<section class="hero is-fullheight-with-navbar">
   <div class="hero-body">
     <div class="container">
       <div class="columns is-centered">
         <div class="column is-8 has-text-centered">
-          <h1 class="title">
-            Uncover Hidden MicroSaaS Gold Mines in Existing Markets
+          <h1 class="title mb-4">
+            Uncover Hidden MicroSaaS Opportunities in Existing Markets
           </h1>
           <p class="subtitle has-text-white is-size-4 mb-6">
             Turn established SaaS pain points into profitable micro-products. Get data-driven insights and ready-to-build opportunities.
@@ -174,7 +174,7 @@
             <a href="{% url 'account_signup' %}" class="button is-primary is-rounded is-large">
               Start Your Analysis
             </a>
-            <a href="#how-it-works" class="button is-white is-outlined is-rounded">
+            <a href="#how-it-works" class="button is-primary is-outlined is-rounded">
               See How It Works
             </a>
           </div>

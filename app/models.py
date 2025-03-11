@@ -6,6 +6,7 @@ from django.urls import reverse
 class SaaSAnalysis(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=255)
+    search_queries = models.TextField( null =  True, blank= True)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     product_url = models.URLField()
     description = models.TextField()
