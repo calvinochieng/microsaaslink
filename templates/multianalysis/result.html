@@ -1,0 +1,395 @@
+{% extends "multianalysis/dashboard/dashboard.html" %}
+
+{% block title %} {{ analysis.target_saas.name }} Analysis Results{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="header-box mb-6">
+      <h1 class="title is-2 has-text-primary">Analysis Results for {{ project.name }}</h1>
+      <div class="subtitle-block">
+        <p class="subtitle is-5 has-text-grey">
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-calendar-plus"></i>
+            </span>
+            <span>Created: {{ project.created_at|date:"M d, Y" }}</span>
+          </span>
+          <span class="mx-3">|</span>
+          <span class="icon-text">
+            <span class="icon">
+              <i class="fas fa-calendar-check"></i>
+            </span>
+            <span>Updated: {{ project.updated_at|date:"M d, Y" }}</span>
+          </span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Target SaaS Section -->
+    <div class="collapsible-card card mb-5">
+      <div class="card-header collapsible-header">
+        <p class="card-header-title is-size-4">
+          <span class="icon mr-2">
+            <i class="fas fa-bullseye"></i>
+          </span>
+          Target SaaS
+        </p>
+        <button class="card-header-icon">
+          <span class="icon chevron">
+            <i class="fas fa-chevron-down"></i>
+          </span>
+        </button>
+      </div>
+      <div class="collapsible-content is-collapsible">
+        <div class="card-content">
+          <div class="content">
+            <div class="columns is-multiline">
+              <div class="column is-half">
+                <h3 class="title is-5 has-text-grey">Basic Information</h3>
+                <dl class="detail-list">
+                  <dt>Name</dt>
+                  <dd>{{ analysis.target_saas.name }}</dd>
+                  
+                  <dt>URL</dt>
+                  <dd>
+                    {% if analysis.target_saas.url %}
+                      <a href="{{ analysis.target_saas.url }}" target="_blank" class="is-link">
+                        {{ analysis.target_saas.url }}
+                      </a>
+                    {% else %}
+                      N/A
+                    {% endif %}
+                  </dd>
+                </dl>
+              </div>
+
+              <div class="column is-half">
+                <h3 class="title is-5 has-text-grey">Audience & Features</h3>
+                <dl class="detail-list">
+                  <dt>Target Audience</dt>
+                  <dd>{{ analysis.target_saas.target_audience|join:", " }}</dd>
+                  
+                  <dt>Key Features</dt>
+                  <dd>{{ analysis.target_saas.key_features|join:", " }}</dd>
+                </dl>
+              </div>
+
+              <div class="column is-full">
+                <h3 class="title is-5 has-text-grey">Differentiation</h3>
+                <p class="differential-factor">
+                  {{ analysis.target_saas.differential_factor }}
+                </p>
+              </div>
+
+              <div class="column is-full">
+                <h3 class="title is-5 has-text-grey">Pain Points</h3>
+                {% if analysis.target_saas.pain_points %}
+                  <div class="pain-points-grid">
+                    {% for pain in analysis.target_saas.pain_points %}
+                      <div class="pain-point notification is-light">
+                        <div class="severity-indicator severity-{{ pain.severity|lower }}"></div>
+                        <div class="pain-content">
+                          <p class="has-text-weight-semibold">{{ pain.issue }}</p>
+                          <p class="has-text-grey">Severity: {{ pain.severity }}</p>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% else %}
+                  <div class="notification is-warning is-light">
+                    No pain points identified
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Competitors Section -->
+    <div class="collapsible-card card mb-5">
+      <div class="card-header collapsible-header">
+        <p class="card-header-title is-size-4">
+          <span class="icon mr-2">
+            <i class="fas fa-chess-board"></i>
+          </span>
+          Competitor Analysis
+        </p>
+        <button class="card-header-icon">
+          <span class="icon chevron">
+            <i class="fas fa-chevron-down"></i>
+          </span>
+        </button>
+      </div>
+      <div class="collapsible-content is-collapsible">
+        <div class="card-content">
+          {% if analysis.competitors %}
+            <div class="competitors-grid">
+              {% for competitor in analysis.competitors %}
+                <div class="competitor-card box">
+                  <h3 class="title is-5 mb-4">{{ competitor.name }}</h3>
+                  <div class="content">
+                    <p class="has-text-grey-dark">{{ competitor.description }}</p>
+                    <div class="competitor-meta mt-3">
+                      <span class="tag is-info is-light">
+                        <a href="{{ competitor.url }}" target="_blank">
+                          <span class="icon">
+                            <i class="fas fa-external-link-alt"></i>
+                          </span>
+                          Visit Site
+                        </a>
+                      </span>
+                      <span class="tag is-primary is-light ml-2">
+                        Audience: {{ competitor.target_audience|join:", " }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="notification is-warning is-light">
+              No competitors identified in this analysis
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Combined Analysis Section -->
+    <div class="collapsible-card card mb-5">
+      <div class="card-header collapsible-header">
+        <p class="card-header-title is-size-4">
+          <span class="icon mr-2">
+            <i class="fas fa-chart-network"></i>
+          </span>
+          Market Opportunity Analysis
+        </p>
+        <button class="card-header-icon">
+          <span class="icon chevron">
+            <i class="fas fa-chevron-down"></i>
+          </span>
+        </button>
+      </div>
+      <div class="collapsible-content is-collapsible">
+        <div class="card-content">
+          <div class="columns">
+            <!-- Patterns Column -->
+            <div class="column">
+              <h3 class="title is-5 has-text-grey mb-4">Common Patterns</h3>
+              {% if analysis.combined_pain_points.patterns %}
+                <div class="patterns-list">
+                  {% for pattern in analysis.combined_pain_points.patterns %}
+                    <div class="pattern-item notification is-light">
+                      <h4 class="subtitle is-6 has-text-weight-bold">{{ pattern.category }}</h4>
+                      <p>{{ pattern.description }}</p>
+                      <div class="tags mt-2">
+                        <span class="tag is-info is-light">
+                          <span class="icon"><i class="fas fa-project-diagram"></i></span>
+                          {{ pattern.prevalence }}
+                        </span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Market Gaps Column -->
+            <div class="column">
+              <h3 class="title is-5 has-text-grey mb-4">Identified Market Gaps</h3>
+              {% if analysis.combined_pain_points.market_gaps %}
+                <div class="gaps-list">
+                  {% for gap in analysis.combined_pain_points.market_gaps %}
+                    <div class="gap-item notification is-light">
+                      <h4 class="subtitle is-6 has-text-weight-bold">{{ gap.gap }}</h4>
+                      <p class="has-text-grey">{{ gap.explanation }}</p>
+                      <div class="tags mt-2">
+                        <span class="tag is-danger is-light">
+                          Severity: {{ gap.severity }}
+                        </span>
+                        <span class="tag is-success is-light">
+                          Opportunity: {{ gap.opportunity_size }}
+                        </span>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Micro-SaaS Ideas Section -->
+    <div class="ideas-card card mb-5">
+      <div class="card-header">
+        <p class="card-header-title is-size-4">
+          <span class="icon mr-2">
+            <i class="fas fa-lightbulb"></i>
+          </span>
+          Recommended Micro-SaaS Opportunities
+        </p>
+      </div>
+      <div class="card-content">
+        {% if analysis.micro_saas_ideas %}
+          <div class="ideas-grid">
+            {% for idea in analysis.micro_saas_ideas %}
+              <div class="idea-card box">
+                <div class="idea-header">
+                  <h3 class="title is-5 has-text-primary">{{ idea.name }}</h3>
+                  <p class="subtitle is-6 has-text-grey">{{ idea.tagline }}</p>
+                </div>
+                
+                <div class="content">
+                  <p class="has-text-grey-dark">{{ idea.description }}</p>
+                  
+                  <div class="idea-meta mt-4">
+                    <div class="columns is-multiline">
+                      <div class="column is-half">
+                        <div class="meta-item">
+                          <span class="icon has-text-info">
+                            <i class="fas fa-users"></i>
+                          </span>
+                          <strong>Audience:</strong> {{ idea.target_audience }}
+                        </div>
+                        <div class="meta-item">
+                          <span class="icon has-text-success">
+                            <i class="fas fa-star"></i>
+                          </span>
+                          <strong>Key Features:</strong> {{ idea.key_features|join:", " }}
+                        </div>
+                      </div>
+                      
+                      <div class="column is-half">
+                        <div class="meta-item">
+                          <span class="icon has-text-warning">
+                            <i class="fas fa-coins"></i>
+                          </span>
+                          <strong>Pricing Model:</strong> {{ idea.pricing_model }}
+                        </div>
+                        <div class="meta-item">
+                          <span class="icon has-text-danger">
+                            <i class="fas fa-hard-hat"></i>
+                          </span>
+                          <strong>Difficulty:</strong> {{ idea.implementation_difficulty }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="notification is-warning is-light">
+            No Micro-SaaS ideas generated in this analysis
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .collapsible-card {
+    transition: all 0.3s ease;
+    border: 1px solid #eee;
+  }
+
+  .collapsible-header {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .collapsible-header:hover {
+    background-color: #f9f9f9;
+  }
+
+  .is-collapsible {
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .is-collapsible.is-active {
+    max-height: 5000px;
+    opacity: 1;
+  }
+
+  .chevron {
+    transition: transform 0.3s ease;
+  }
+
+  .is-active .chevron {
+    transform: rotate(180deg);
+  }
+
+  .pain-points-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+
+  .pain-point {
+    position: relative;
+    padding-left: 1.5rem;
+  }
+
+  .severity-indicator {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 80%;
+    border-radius: 4px;
+  }
+
+  .severity-high { background-color: #ff3860; }
+  .severity-medium { background-color: #ffdd57; }
+  .severity-low { background-color: #48c774; }
+
+  .ideas-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+
+  .meta-item {
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-list dt {
+    font-weight: 600;
+    color: #4a4a4a;
+    margin-top: 0.5rem;
+  }
+
+  .detail-list dd {
+    margin-left: 1rem;
+    color: #666;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.collapsible-header').forEach(header => {
+    header.addEventListener('click', function() {
+      const card = this.closest('.collapsible-card');
+      const content = card.querySelector('.is-collapsible');
+      const chevron = card.querySelector('.chevron');
+      
+      content.classList.toggle('is-active');
+      chevron.classList.toggle('is-active');
+      card.classList.toggle('is-active');
+    });
+  });
+});
+</script>
+
+{% endblock %}

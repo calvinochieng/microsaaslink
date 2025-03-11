@@ -6,28 +6,51 @@ import json
 import time
 from datetime import datetime
 import os
+# Marker
+from django.shortcuts import get_object_or_404
 
 class MultiStepSaaSAnalyzer:
-    def __init__(self, api_key=None):
-        """Initialize the SaaS Analyzer with a Gemini API key"""
+    def __init__(self, project_id=None, api_key=None):
+        """Initialize the SaaS Analyzer with a Gemini API key and project ID"""
+        from multianalysis.models import Project  # Import here to avoid circular imports
+        
         self.api_key = api_key or config("GEMINI_API_KEY")
         self.client = genai.Client(api_key=self.api_key)
         self.model_id = "gemini-2.0-flash"  # Using a powerful model for analysis
         self.google_search_tool = Tool(google_search=GoogleSearch())
         
-        # Storage for analysis results
-        self.target_saas = {
-            'name': None,
-            'url': None,
-            'description': None,
-            'target_audience': None,
-            'differential_factor': None,
-            'pain_points': []
-        }
-        self.competitors = []
-        self.competitor_pain_points = {}
-        self.combined_pain_points = []
-        self.micro_saas_ideas = []
+        # If project_id is provided, load the project
+        self.project = None
+        if project_id:
+            self.project = get_object_or_404(Project, id=project_id)
+            
+            # Load existing data if available
+            self.target_saas = self.project.target_saas or {
+                'name': None,
+                'url': None,
+                'description': None,
+                'target_audience': None,
+                'differential_factor': None,
+                'pain_points': []
+            }
+            self.competitors = self.project.competitors or []
+            self.competitor_pain_points = self.project.competitor_pain_points or {}
+            self.combined_pain_points = self.project.combined_pain_points or []
+            self.micro_saas_ideas = self.project.micro_saas_ideas or []
+        else:
+            # Default empty structures
+            self.target_saas = {
+                'name': None,
+                'url': None,
+                'description': None,
+                'target_audience': None,
+                'differential_factor': None,
+                'pain_points': []
+            }
+            self.competitors = []
+            self.competitor_pain_points = {}
+            self.combined_pain_points = []
+            self.micro_saas_ideas = []
         
     def analyze_target_saas(self, name, url=None):
         """Step 1: Analyze the target SaaS company"""
@@ -71,6 +94,15 @@ class MultiStepSaaSAnalyzer:
             if result:
                 self.target_saas = result
                 self._print_target_analysis(result)
+                
+                # Update the project model
+                if self.project:
+                    self.project.name = result['name']
+                    self.project.url = result['url']
+                    self.project.description = result['description']
+                    self.project.target_saas = result
+                    self.project.save()
+                
                 return result
             else:
                 print("Failed to analyze target SaaS. Please try again.")
@@ -126,6 +158,12 @@ class MultiStepSaaSAnalyzer:
             if result:
                 self.competitors = result
                 self._print_competitor_analysis(result)
+                
+                # Update the project model
+                if self.project:
+                    self.project.competitors = result
+                    self.project.save()
+                
                 return result
             else:
                 print("Failed to identify competitors. Please try again.")
@@ -187,6 +225,12 @@ class MultiStepSaaSAnalyzer:
             time.sleep(1)
         
         print(self.competitor_pain_points)
+        
+        # Update the project model
+        if self.project:
+            self.project.competitor_pain_points = self.competitor_pain_points
+            self.project.save()
+        
         return self.competitor_pain_points
     
     def combine_pain_points(self):
@@ -235,6 +279,12 @@ class MultiStepSaaSAnalyzer:
             if result:
                 self.combined_pain_points = result
                 self._print_combined_analysis(result)
+                
+                # Update the project model
+                if self.project:
+                    self.project.combined_pain_points = result
+                    self.project.save()
+                
                 return result
             else:
                 print("Failed to combine pain points. Please try again.")
@@ -243,68 +293,6 @@ class MultiStepSaaSAnalyzer:
             print(f"Error in combine_pain_points: {str(e)}")
             return None
     
-    # def generate_micro_saas_ideas(self, max_ideas=3):
-    #     """Step 5: Generate micro-SaaS ideas based on identified market gaps"""
-    #     if not self.combined_pain_points:
-    #         print("Error: Combined pain points analysis not complete. Please combine pain points first.")
-    #         return None
-            
-    #     print(f"\n{'='*80}\nSTEP 5: GENERATING MICRO-SAAS IDEAS\n{'='*80}")
-        
-    #     # Extract market gaps for the prompt
-    #     market_gaps = self.combined_pain_points.get('market_gaps', [])
-    #     if not market_gaps:
-    #         print("No significant market gaps identified to generate micro-SaaS ideas.")
-    #         return None
-        
-    #     gaps_summary = ""
-    #     for i, gap in enumerate(market_gaps, 1):
-    #         gaps_summary += f"{i}. {gap['gap']} (Severity: {gap['severity']}, Opportunity: {gap['opportunity_size']})\n"
-    #         gaps_summary += f"   Explanation: {gap['explanation']}\n\n"
-        
-    #     prompt = f"""
-    #     You are a SaaS product strategist developing micro-SaaS ideas based on identified market gaps.
-        
-    #     TARGET SAAS MARKET: {self.target_saas['description']}
-
-    #     IDENTIFIED MARKET GAPS:
-    #     {gaps_summary}
-        
-    #     TASK:
-    #     Generate {max_ideas} well-validated micro-SaaS product concepts based on these market gaps. 
-        
-    #     For each micro-SaaS idea:
-    #     1. Create a compelling name and tagline
-    #     2. Provide a concise description of the solution
-    #     3. Define the specific target audience
-    #     4. List 3-5 key features that directly address the market gap
-    #     5. Suggest a pricing model
-    #     6. Explain why this would succeed (validation points)
-    #     7. Estimate implementation difficulty (1-10)
-        
-    #     Format your response as a clean JSON array where each object has keys:
-    #     "name", "tagline", "description", "target_audience", "key_features", "pricing_model", "validation", "implementation_difficulty"
-        
-    #     Focus on creating highly focused, specialized solutions that have a clear value proposition and could be built by a small team.
-    #     """
-        
-    #     try:
-    #         response = self._generate_content(prompt)
-    #         result = self._extract_json(response.text)
-    #         print(result)
-            
-    #         if result:
-    #             self.micro_saas_ideas = result
-    #             self._print_micro_saas_ideas(result)
-    #             return result
-    #         else:
-    #             print("Failed to generate micro-SaaS ideas. Please try again.")
-    #             return None
-    #     except Exception as e:
-    #         print(f"Error in generate_micro_saas_ideas: {str(e)}")
-    #         return None
-    
-
     def generate_micro_saas_ideas(self, max_ideas=3):
         """Step 5: Generate micro-SaaS ideas based on identified market gaps"""
         if not self.combined_pain_points:
@@ -377,6 +365,13 @@ class MultiStepSaaSAnalyzer:
             if result:
                 self.micro_saas_ideas = result
                 self._print_micro_saas_ideas(result)
+                
+                # Update the project model
+                if self.project:
+                    self.project.micro_saas_ideas = result
+                    self.project.status = True  # Mark as completed
+                    self.project.save()
+                
                 return result
             else:
                 print("Failed to generate micro-SaaS ideas. Please try again.")
@@ -385,19 +380,12 @@ class MultiStepSaaSAnalyzer:
             print(f"Error in generate_micro_saas_ideas: {str(e)}")
             return None
 
-
-
-    def save_analysis(self, filename=None):
-        """Save the complete analysis to a JSON file"""
-        if not self.target_saas['name']:
+    def save_analysis(self):
+        """Save the complete analysis to the Project model instance instead of a JSON file."""
+        if not self.target_saas.get('name'):
             print("No analysis to save. Please complete at least the first step.")
             return None
-        
-        if not filename:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            sanitized_name = ''.join(c if c.isalnum() else '_' for c in self.target_saas['name'])
-            filename = f"saas_analysis_{sanitized_name}_{timestamp}.json"
-        
+
         analysis = {
             'target_saas': self.target_saas,
             'competitors': self.competitors,
@@ -407,16 +395,25 @@ class MultiStepSaaSAnalyzer:
             'timestamp': datetime.now().isoformat(),
             'analysis_complete': bool(self.micro_saas_ideas)
         }
-        
+
         try:
-            with open(filename, 'w', encoding='utf-8') as f:
-                json.dump(analysis, f, indent=2, ensure_ascii=False)
+            # Update the project instance with the analysis data
+            self.project.target_saas = self.target_saas
+            self.project.competitors = self.competitors
+            self.project.competitor_pain_points = self.competitor_pain_points
+            self.project.combined_pain_points = self.combined_pain_points
+            self.project.micro_saas_ideas = self.micro_saas_ideas
             
-            print(f"\nComplete analysis saved to {filename}")
-            return filename
+            # Optionally update a status flag to indicate analysis completion
+            self.project.status = bool(self.micro_saas_ideas)
+            self.project.save()
+
+            print("\nComplete analysis saved to the Project model.")
+            return self.project
         except Exception as e:
-            print(f"Error saving analysis: {str(e)}")
+            print(f"Error saving analysis to model: {str(e)}")
             return None
+
 
     def full_analysis(self, name, url=None, max_ideas=3):
         """Run the complete multi-step analysis process"""
@@ -566,6 +563,22 @@ class MultiStepSaaSAnalyzer:
             print(f"   Validation: {idea['validation']}")
             print(f"   Implementation Difficulty: {idea['implementation_difficulty']}/10")
 
+# Example usage with Django integration
+'''
+# Create a new project and run analysis
+from .models import Project
+from django.contrib.auth.models import User
+
+user = User.objects.get(id=1)  # Get a user
+project = Project.objects.create(user=user, name="Initial Project")
+analyzer = MultiStepSaaSAnalyzer(project_id=project.id)
+result = analyzer.full_analysis("Zoom", "https://zoom.us")
+
+# Or continue an existing analysis
+existing_project = Project.objects.get(id=123)
+analyzer = MultiStepSaaSAnalyzer(project_id=existing_project.id)
+analyzer.generate_micro_saas_ideas()  # Continue from where it left off
+'''
 
 # Example usage
 if __name__ == "__main__":

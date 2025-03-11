@@ -1,0 +1,66 @@
+{% extends "multianalysis/dashboard/dashboard.html" %}
+    
+{% block title %}Micro-SaaS Ideas{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <h1 class="title">Micro-SaaS Ideas</h1>
+    <div class="columns"> 
+        <div class="column is-12">
+          <div class="card">
+            <div class="card-content p-0">
+              <table class="table is-fullwidth is-hoverable">
+                <thead>
+                  <tr>
+                    <th>Idea Name</th>
+                    <th>Source Project</th>
+                    <th>Description</th>
+                    <th>Key Features</th>
+                    <th>Implementation Difficulty</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for idea in items %}
+                  <tr>
+                    <td>
+                      <p class="has-text-weight-medium">{{ idea.name }}</p>
+                      <p class="is-size-7 has-text-grey">{{ idea.tagline }}</p>
+                    </td>
+                    <td>{{ idea.project_name|default:"N/A" }}</td>
+                    <td>{{ idea.description|truncatechars:100 }}</td>
+                    <td>
+                      {% if idea.key_features %}
+                        {{ idea.key_features|join:", " }}
+                      {% else %}
+                        N/A
+                      {% endif %}
+                    </td>
+                    <td>{{ idea.implementation_difficulty }}/10</td>
+                    <td>
+                      <div class="buttons are-small">
+                        <!-- Update the URL if you have a detail view for ideas -->
+                        <a href="" class="button is-link">
+                          <span class="icon is-small">
+                            <i class="fas fa-eye"></i>
+                          </span>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="6">No micro-SaaS ideas found.</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+       
+</section>
+{% endblock %}
+

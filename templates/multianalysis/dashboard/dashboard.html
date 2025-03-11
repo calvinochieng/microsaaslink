@@ -3,508 +3,414 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SaaS Analysis Platform</title>
+  <title> {% block title %}{% endblock %}MicroSaaSLink - Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .module-card {
+    /* Montserrat Font */
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Montserrat', sans-serif;
+      {% comment %} background-color: #f7f9fc; {% endcomment %}
+    }
+
+
+
+    /* Main Content Area */
+    .main-content {
+      padding: 2rem;
+      transition: margin-left 0.3s ease;
+      margin-left: 80px;
+    }
+
+    /* Card Customization */
+    .card {
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
       height: 100%;
-      transition: all 0.3s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .module-card:hover {
+
+    .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.1);
     }
-    .module-card.is-locked {
-      opacity: 0.7;
+
+    /* Project Cards */
+    .project-card {
+      position: relative;
+      overflow: hidden;
     }
-    .module-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+
+    .project-card .status-indicator {
+      position: absolute;
+      top: 15px;
+      right: 15px;
     }
-    .progress-indicator {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 2rem;
+
+    .project-card .progress-mini {
+      height: 4px;
+      margin-top: 0.5rem;
     }
-    .progress-step {
+
+    /* Quick Stats */
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #3273dc;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: #7a7a7a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Project Creation Button */
+    .new-project-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      flex: 1;
-      position: relative;
-    }
-    .progress-step::before {
-      content: '';
-      position: absolute;
-      top: 20px;
-      left: -50%;
-      width: 100%;
-      height: 3px;
-      background-color: #dbdbdb;
-      z-index: 0;
-    }
-    .progress-step:first-child::before {
-      display: none;
-    }
-    .progress-step.is-active .step-circle {
-      background-color: #3273dc;
-    }
-    .progress-step.is-completed .step-circle {
-      background-color: #23d160;
-    }
-    .step-circle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background-color: #dbdbdb;
-      display: flex;
       justify-content: center;
-      align-items: center;
-      color: white;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      z-index: 1;
-    }
-    .tabs li.is-active a {
-      border-bottom-color: #3273dc;
-      color: #3273dc;
-    }
-    .tag.is-status {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-    .panel {
       height: 100%;
+      min-height: 200px;
+      cursor: pointer;
+      background-color: #f5f9ff;
+      border: 2px dashed #c9d8f0;
     }
-    .navbar-item img {
-      max-height: 2.5rem;
+
+    .new-project-card:hover {
+      background-color: #e8f1ff;
+    }
+
+    .circle-icon {
+      width: 60px;
+      height: 60px;
+      background-color: #4299E1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+
+    .circle-icon i {
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    /* Navbar */
+    .navbar {
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border-bottom: 1px solid #eef2f7;
+      background-color: white;
+    }
+
+    .navbar-item.user-profile img {
+      margin-right: 0.5rem;
+    }
+
+    /* Responsive adjustments */
+    @media screen and (max-width: 768px) {
+      .side-drawer {
+        transform: translateX(-100%);
+      }
+      
+      .side-drawer.is-active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
     }
   </style>
+  {% block custom_styles %}{% endblock custom_styles %}
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar is-light" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-      <a class="navbar-item" href="#">
-        <span class="has-text-weight-bold is-size-4 has-text-primary">SaaS<span class="has-text-info">Scout</span></span>
-      </a>
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
-    </div>
-    <div class="navbar-menu">
-      <div class="navbar-start">
-        <a class="navbar-item is-active">
-          Dashboard
-        </a>
-        <a class="navbar-item">
-          Projects
-        </a>
-        <a class="navbar-item">
-          Templates
-        </a>
-        <a class="navbar-item">
-          Reports
-        </a>
-      </div>
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <div class="buttons">
-            <a class="button is-primary">
-              <strong>New Project</strong>
-            </a>
-            <a class="button is-light">
-              Help
-            </a>
+  <!-- Side Drawer -->
+  {% include "multianalysis/dashboard/aside.html" %}
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent" style="background-color:#1f2229;">
+     
+    {% block content %}
+    
+    <!-- Quick Analysis Start -->
+    <div class="columns">
+      <div class="column is-12">
+        <div class="card">
+          <div class="card-content">
+            <h3 class="title is-5">Quick Analysis</h3>
+            <p class="subtitle is-6">Start analyzing a SaaS product right away</p>
+            
+            <div class="field has-addons">
+              <div class="control is-expanded">
+                <input class="input" type="text" placeholder="Enter a SaaS product name or URL (e.g., notion.so)">
+              </div>
+              <div class="control">
+                <button class="button is-primary">
+                  Start Analysis
+                </button>
+              </div>
+            </div>
+            
+            <p class="has-text-grey is-size-7 mt-2">
+              Recent searches: Airtable, Mailchimp, Monday.com
+            </p>
           </div>
         </div>
       </div>
     </div>
-  </nav>
+    <!-- Quick Stats Section -->
+    <div class="columns is-multiline mb-6">
+      <div class="column is-3">
+        <div class="card">
+          <div class="card-content">
+            <p class="stat-label">Total Projects</p>
+            <p class="stat-value">{{ total_projects }}</p>
+            <p class="has-text-grey is-size-7 mt-2">
+              <span class="icon has-text-success is-small">
+                <i class="fas fa-arrow-up"></i>
+              </span>
+              <span>{{ project_change_percentage }} from last month</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="column is-3">
+        <div class="card">
+          <div class="card-content">
+            <p class="stat-label">Active Analyses</p>
+            <p class="stat-value">{{ active_projects }}</p>
+            <p class="has-text-grey is-size-7 mt-2">
+              <span class="icon has-text-success is-small">
+                <i class="fas fa-arrow-up"></i>
+              </span>
+              <span>{{ new_projects_this_week }} new this week</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="column is-3">
+        <div class="card">
+          <div class="card-content">
+            <p class="stat-label">Generated Ideas</p>
+            <p class="stat-value">{{ generated_ideas }}</p>
+            <p class="has-text-grey is-size-7 mt-2">
+              <span class="icon has-text-success is-small">
+                <i class="fas fa-arrow-up"></i>
+              </span>
+              <span>{{ new_ideas_this_month }} new this month</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="column is-3">
+        <div class="card">
+          <div class="card-content">
+            <p class="stat-label">Pain Points Identified</p>
+            <p class="stat-value">{{ pain_points_identified }}</p>
+            <p class="has-text-grey is-size-7 mt-2">
+              <span class="icon has-text-info is-small">
+                <i class="fas fa-database"></i>
+              </span>
+              <span>Growing database</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- Main Content -->
-  <section class="section">
-    <div class="container">
-      <!-- Project Header -->
-      <div class="level">
+    
+    <!-- My Projects Section -->
+    <div class="mb-6">
+      <div class="level mb-4">
         <div class="level-left">
           <div class="level-item">
-            <h1 class="title">Synthesia Analysis Project</h1>
+            <h2 class="title is-4">Recent Projects</h2>
           </div>
         </div>
         <div class="level-right">
           <div class="level-item">
             <div class="buttons">
-              <button class="button is-info">
+              <button class="button is-info is-light is-small">
                 <span class="icon is-small">
-                  <i class="fas fa-save"></i>
+                  <i class="fas fa-filter"></i>
                 </span>
-                <span>Save Project</span>
+                <span>Filter</span>
               </button>
-              <button class="button is-success">
+              <a href="{% url 'saas_analyzer:analyze_saas' %}" class="button is-primary">
                 <span class="icon is-small">
-                  <i class="fas fa-file-export"></i>
+                  <i class="fas fa-plus"></i>
                 </span>
-                <span>Export Analysis</span>
-              </button>
+                <span>New Project</span>
+              </a>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- Progress Indicator -->
-      <div class="progress-indicator">
-        <div class="progress-step is-completed">
-          <div class="step-circle">
-            <i class="fas fa-check"></i>
-          </div>
-          <span class="is-size-7">SaaS Profile</span>
-        </div>
-        <div class="progress-step is-completed">
-          <div class="step-circle">
-            <i class="fas fa-check"></i>
-          </div>
-          <span class="is-size-7">Competitors</span>
-        </div>
-        <div class="progress-step is-active">
-          <div class="step-circle">3</div>
-          <span class="is-size-7">Pain Points</span>
-        </div>
-        <div class="progress-step">
-          <div class="step-circle">4</div>
-          <span class="is-size-7">Market Gaps</span>
-        </div>
-        <div class="progress-step">
-          <div class="step-circle">5</div>
-          <span class="is-size-7">Recommendations</span>
-        </div>
-      </div>
-
-      <!-- Module Tabs -->
-      <div class="tabs is-boxed">
-        <ul>
-          <li>
-            <a>
-              <span class="icon is-small"><i class="fas fa-info-circle"></i></span>
-              <span>SaaS Profile</span>
-              <span class="tag is-success is-small ml-2">Complete</span>
-            </a>
-          </li>
-          <li>
-            <a>
-              <span class="icon is-small"><i class="fas fa-chess"></i></span>
-              <span>Competitors</span>
-              <span class="tag is-success is-small ml-2">Complete</span>
-            </a>
-          </li>
-          <li class="is-active">
-            <a>
-              <span class="icon is-small"><i class="fas fa-exclamation-triangle"></i></span>
-              <span>Pain Points</span>
-              <span class="tag is-warning is-small ml-2">In Progress</span>
-            </a>
-          </li>
-          <li>
-            <a>
-              <span class="icon is-small"><i class="fas fa-chart-pie"></i></span>
-              <span>Market Gaps</span>
-              <span class="tag is-light is-small ml-2">Locked</span>
-            </a>
-          </li>
-          <li>
-            <a>
-              <span class="icon is-small"><i class="fas fa-lightbulb"></i></span>
-              <span>MicroSaaS Ideas</span>
-              <span class="tag is-light is-small ml-2">Locked</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Current Module Content: Pain Points Analysis -->
-      <div class="box">
-        <h2 class="title is-4">User Pain Points</h2>
-        <p class="subtitle is-6">Identify and catalog user pain points for Synthesia</p>
-        
-        <!-- Pain Points List -->
-        <div class="panel">
-          <!-- Controls -->
-          <div class="level">
-            <div class="level-left">
-              <div class="level-item">
-                <div class="field has-addons">
-                  <div class="control">
-                    <input class="input" type="text" placeholder="Search pain points">
-                  </div>
-                  <div class="control">
-                    <a class="button is-info">
-                      Search
-                    </a>
-                  </div>
+      
+      <div class="columns is-multiline">
+        <!-- New Project Card -->
+         
+          {% for project in projects %}
+          <div class="column is-4">
+            <div class="card project-card">
+              <div class="card-content">
+                <span class="tag {% if project.status %}is-success{% else %}is-warning{% endif %} status-indicator">
+                  {% if project.status %}Completed{% else %}In Progress{% endif %}
+                </span>
+                <p class="title is-5">{{ project.name }}</p>
+                <p class="subtitle is-6 has-text-grey">
+                  {{ project.description|default:"No description available"|truncatechars:70 }}
+                </p>
+                
+                <div class="content">
+                  <p class="is-size-7">Created: {{ project.created_at|date:"M d, Y" }}</p>
+                  <p class="is-size-7">Last Updated: {{ project.updated_at|date:"M d, Y" }}</p>
                 </div>
               </div>
-            </div>
-            <div class="level-right">
-              <div class="level-item">
-                <button class="button is-primary">
-                  <span class="icon is-small">
-                    <i class="fas fa-plus"></i>
-                  </span>
-                  <span>Add Pain Point</span>
-                </button>
-              </div>
+              <footer class="card-footer">
+                <a href="{% url 'saas_analyzer:project_detail' project.slug %}" class="card-footer-item is-size-7">Continue Analysis</a>
+                <a href="{% url 'saas_analyzer:project_detail' project.slug %}" class="card-footer-item is-size-7">View Details</a>
+              </footer>
             </div>
           </div>
+          {% endfor %} 
 
-          <!-- Pain Points Table -->
-          <div class="table-container">
-            <table class="table is-fullwidth is-hoverable">
-              <thead>
-                <tr>
-                  <th>Category</th>
-                  <th>Pain Point</th>
-                  <th>Severity</th>
-                  <th>Affected Segments</th>
-                  <th>Sources</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <span class="tag is-info">Personalization</span>
-                  </td>
-                  <td>Limited ability to create fully customized avatars that match brand identity</td>
-                  <td>
-                    <span class="tag is-danger">High</span>
-                  </td>
-                  <td>Marketing teams, Brand managers</td>
-                  <td>
-                    <span class="tag is-light">G2 (3)</span>
-                    <span class="tag is-light">Reddit (5)</span>
-                  </td>
-                  <td>
-                    <div class="buttons are-small">
-                      <button class="button is-light">
-                        <span class="icon is-small">
-                          <i class="fas fa-edit"></i>
-                        </span>
-                      </button>
-                      <button class="button is-light">
-                        <span class="icon is-small">
-                          <i class="fas fa-trash"></i>
-                        </span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span class="tag is-info">Performance</span>
-                  </td>
-                  <td>Occasional unnatural movements, expressions or voice inflections</td>
-                  <td>
-                    <span class="tag is-warning">Medium</span>
-                  </td>
-                  <td>Professional content creators, Enterprise clients</td>
-                  <td>
-                    <span class="tag is-light">Capterra (7)</span>
-                    <span class="tag is-light">Twitter (4)</span>
-                  </td>
-                  <td>
-                    <div class="buttons are-small">
-                      <button class="button is-light">
-                        <span class="icon is-small">
-                          <i class="fas fa-edit"></i>
-                        </span>
-                      </button>
-                      <button class="button is-light">
-                        <span class="icon is-small">
-                          <i class="fas fa-trash"></i>
-                        </span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span class="tag is-info">Integration</span>
-                  </td>
-                  <td>Limited integration with existing content management systems and marketing tools</td>
-                  <td>
-                    <span class="tag is-danger">High</span>
-                  </td>
-                  <td>Marketing teams, Enterprise users</td>
-                  <td>
-                    <span class="tag is-light">Interviews (3)</span>
-                    <span class="tag is-light">G2 (8)</span>
-                  </td>
-                  <td>
-                    <div class="buttons are-small">
-                      <button class="button is-light">
-                        <span class="icon is-small">
-                          <i class="fas fa-edit"></i>
-                        </span>
-                      </button>
-                      <button class="button is-light">
-                        <span class="icon is-small">
-                          <i class="fas fa-trash"></i>
-                        </span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Pain Point Addition Form -->
-        <div class="box mt-5">
-          <h3 class="title is-5">Add New Pain Point</h3>
-          
-          <div class="field">
-            <label class="label">Category</label>
-            <div class="control">
-              <div class="select is-fullwidth">
-                <select>
-                  <option>Personalization</option>
-                  <option>Performance</option>
-                  <option>Integration</option>
-                  <option>UX/UI</option>
-                  <option>Pricing</option>
-                  <option>Technical Support</option>
-                  <option>Feature Limitations</option>
-                  <option>Other</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          
-          <div class="field">
-            <label class="label">Pain Point Description</label>
-            <div class="control">
-              <textarea class="textarea" placeholder="Describe the pain point in detail"></textarea>
-            </div>
-          </div>
-          
-          <div class="columns">
-            <div class="column">
-              <div class="field">
-                <label class="label">Severity</label>
-                <div class="control">
-                  <div class="select is-fullwidth">
-                    <select>
-                      <option>Low</option>
-                      <option>Medium</option>
-                      <option>High</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="column">
-              <div class="field">
-                <label class="label">Frequency</label>
-                <div class="control">
-                  <input class="input" type="text" placeholder="E.g. 23% of reviews">
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="field">
-            <label class="label">Affected User Segments</label>
-            <div class="control">
-              <input class="input" type="text" placeholder="E.g. Marketing teams, SMBs, Content creators">
-            </div>
-          </div>
-          
-          <div class="field">
-            <label class="label">Evidence</label>
-            <div class="control">
-              <textarea class="textarea" placeholder="Provide quotes and sources that document this pain point"></textarea>
-            </div>
-          </div>
-          
-          <div class="field is-grouped">
-            <div class="control">
-              <button class="button is-primary">Add Pain Point</button>
-            </div>
-            <div class="control">
-              <button class="button is-light">Cancel</button>
-            </div>
-          </div>
-        </div>
       </div>
-
-      <!-- Navigation Buttons -->
-      <div class="level mt-5">
+    </div>
+    
+    <!-- Generated Ideas Section -->
+    <div class="mb-6">
+      <div class="level mb-4">
         <div class="level-left">
           <div class="level-item">
-            <button class="button">
-              <span class="icon is-small">
-                <i class="fas fa-arrow-left"></i>
-              </span>
-              <span>Back to Competitors</span>
-            </button>
+            <h2 class="title is-4">Recent Ideas Generated</h2>
           </div>
         </div>
         <div class="level-right">
           <div class="level-item">
-            <button class="button is-primary">
-              <span>Continue to Market Gaps</span>
+            <a href="#" class="button is-text">
+              View All
               <span class="icon is-small">
                 <i class="fas fa-arrow-right"></i>
               </span>
-            </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="columns">
+        <div class="column is-12">
+          <div class="card">
+            <div class="card-content p-0">
+              <table class="table is-fullwidth is-hoverable">
+                <thead>
+                  <tr>
+                    <th>Idea Name</th>
+                    <th>Source Project</th>
+                    <th>Pain Point Addressed</th>
+                    <th>Opportunity Score</th>
+                    <th>Date Generated</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <p class="has-text-weight-medium">CustomAvatarBuilder</p>
+                      <p class="is-size-7 has-text-grey">Custom avatar creation tool for brand identity</p>
+                    </td>
+                    <td>Synthesia Analysis</td>
+                    <td>Limited avatar customization</td>
+                    <td>
+                      <span class="tag is-success">8.5/10</span>
+                    </td>
+                    <td>Mar 8, 2025</td>
+                    <td>
+                      <div class="buttons are-small">
+                        <button class="button is-light">
+                          <span class="icon is-small">
+                            <i class="fas fa-eye"></i>
+                          </span>
+                        </button>
+                        <button class="button is-info is-light">
+                          <span class="icon is-small">
+                            <i class="fas fa-star"></i>
+                          </span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p class="has-text-weight-medium">VideoAutoIntegrate</p>
+                      <p class="is-size-7 has-text-grey">CMS integration for AI video content</p>
+                    </td>
+                    <td>Synthesia Analysis</td>
+                    <td>Limited CMS integration</td>
+                    <td>
+                      <span class="tag is-success">9.2/10</span>
+                    </td>
+                    <td>Mar 8, 2025</td>
+                    <td>
+                      <div class="buttons are-small">
+                        <button class="button is-light">
+                          <span class="icon is-small">
+                            <i class="fas fa-eye"></i>
+                          </span>
+                        </button>
+                        <button class="button is-info is-light">
+                          <span class="icon is-small">
+                            <i class="fas fa-star"></i>
+                          </span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <p class="has-text-weight-medium">JasperTemplateMarket</p>
+                      <p class="is-size-7 has-text-grey">Marketplace for AI content templates</p>
+                    </td>
+                    <td>Jasper Analysis</td>
+                    <td>Limited industry templates</td>
+                    <td>
+                      <span class="tag is-warning">7.8/10</span>
+                    </td>
+                    <td>Mar 5, 2025</td>
+                    <td>
+                      <div class="buttons are-small">
+                        <button class="button is-light">
+                          <span class="icon is-small">
+                            <i class="fas fa-eye"></i>
+                          </span>
+                        </button>
+                        <button class="button is-info is-light">
+                          <span class="icon is-small">
+                            <i class="fas fa-star"></i>
+                          </span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
-
-  <!-- Project Dashboard Modal (Hidden) -->
-  <div class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Project Dashboard</p>
-        <button class="delete" aria-label="close"></button>
-      </header>
-      <section class="modal-card-body">
-        <div class="columns is-multiline">
-          <!-- SaaS Profile Module Card -->
-          <div class="column is-one-third">
-            <div class="card module-card">
-              <div class="card-content has-text-centered">
-                <span class="icon module-icon has-text-info">
-                  <i class="fas fa-info-circle"></i>
-                </span>
-                <p class="title is-5">SaaS Profile</p>
-                <p class="subtitle is-6">Basic information about Synthesia</p>
-                <span class="tag is-success tag is-status">Complete</span>
-              </div>
-              <footer class="card-footer">
-                <a class="card-footer-item">View</a>
-                <a class="card-footer-item">Edit</a>
-              </footer>
-            </div>
-          </div>
-          
-          <!-- Other modules would follow similar pattern -->
-        </div>
-      </section>
-    </div>
+    
+    {% endblock content %}
   </div>
-
-  <script>
-    // JavaScript functionality would go here
-    // For a static mockup, no functionality is implemented
-  </script>
+  {% block scripts %}{% endblock scripts %}
 </body>
 </html>

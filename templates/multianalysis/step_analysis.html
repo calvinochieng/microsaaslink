@@ -1,4 +1,4 @@
-{%extend 'mutlianalysis/dashboard.html'%}
+{%extends 'multianalysis/dashboard/dashboard.html'%}
 {% load static %}
 
   {% block custom_styles %}
@@ -43,7 +43,7 @@
     }
   </style>
   {% endblock custom_styles %}
- {%block content}
+ {% block content %}
 
     <section class="section">
       <div class="container">

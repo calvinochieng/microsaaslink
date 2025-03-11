@@ -1,0 +1,37 @@
+{% extends "multianalysis/dashboard/dashboard.html" %}
+
+{% block title %}SaaS Analysis Results{% endblock %}
+
+{% block content %} 
+     
+  <h1 class="title">Micro-SaaS Ideas</h1>     
+  <div class="columns is-multiline">
+      <!-- New Project Card -->
+      
+        {% for project in items %}
+        <div class="column is-4">
+          <div class="card project-card">
+            <div class="card-content">
+              <span class="tag {% if project.status %}is-success{% else %}is-warning{% endif %} status-indicator">
+                {% if project.status %}Completed{% else %}In Progress{% endif %}
+              </span>
+              <p class="title is-5">{{ project.name }}</p>
+              <p class="subtitle is-6 has-text-grey">
+                {{ project.description|default:"No description available"|truncatechars:70 }}
+              </p>
+              
+              <div class="content">
+                <p class="is-size-7">Created: {{ project.created_at|date:"M d, Y" }}</p>
+                <p class="is-size-7">Last Updated: {{ project.updated_at|date:"M d, Y" }}</p>
+              </div>
+            </div>
+            <footer class="card-footer">
+              <a href="{% url 'saas_analyzer:project_detail' project.slug %}" class="card-footer-item is-size-7">Continue Analysis</a>
+              <a href="{% url 'saas_analyzer:project_detail' project.slug %}" class="card-footer-item is-size-7">View Details</a>
+            </footer>
+          </div>
+        </div>
+        {% endfor %} 
+
+    </div>
+{% endblock %}

@@ -30,7 +30,7 @@ class Project(models.Model):
             original_slug = self.slug
             num = 1
             # Ensure uniqueness of the slug
-            while SaaSAnalysis.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
+            while Project.objects.filter(slug=self.slug).exclude(pk=self.pk).exists():
                 self.slug = f"{original_slug}-{num}"
                 num += 1
         super().save(*args, **kwargs)

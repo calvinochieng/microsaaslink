@@ -211,7 +211,78 @@
             {% endfor %}
         </div>
     {% endif %}
-    {%include 'multianalysis/dashboard/aside.html'%}
+
+    <aside class="side-drawer" id="sideDrawer">
+      <div class="brand">
+        <a href="#" class="brand-name">microSaaSlink</a>
+        <button class="drawer-toggle" id="drawerToggle">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      </div>
+      
+      <nav class="">
+        <ul class="menu-list">
+          <li>
+            <a href="/saas-analyzer/dashboard/" class="is-active">
+              <span class="icon"><i class="fas fa-home fa-fw"></i></span>
+              <span class="menu-text">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-project-diagram fa-fw"></i></span>
+              <span class="menu-text">Projects</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-chart-bar fa-fw"></i></span>
+              <span class="menu-text">New Analysis</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-tasks fa-fw"></i></span>
+              <span class="menu-text">Analysis Status</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-lightbulb fa-fw"></i></span>
+              <span class="menu-text">Generated Ideas</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-question-circle fa-fw"></i></span>
+              <span class="menu-text">Help</span>
+            </a>
+          </li>
+        </ul>
+        
+        <p class="menu-label">Recent Projects</p>
+        <ul class="menu-list">
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-folder fa-fw"></i></span>
+              <span class="menu-text">Synthesia Analysis</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-folder fa-fw"></i></span>
+              <span class="menu-text">Jasper Analysis</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <span class="icon"><i class="fas fa-folder fa-fw"></i></span>
+              <span class="menu-text">Notion Analysis</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
     
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
