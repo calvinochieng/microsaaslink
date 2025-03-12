@@ -4,11 +4,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 import json
-import os
+import re
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from datetime import timedelta
 from django.utils import timezone
+from django.contrib import messages
 
 
 # Import the MultiStepSaaSAnalyzer
@@ -36,7 +37,7 @@ def dashboard(request):
     user_projects = Project.objects.filter(user=request.user)
     
     # Main dashboard items
-    projects = user_projects.order_by('-updated_at')[:4]
+    projects = user_projects.order_by('-updated_at')[:6]
     activities = user_projects.order_by('-created_at')[:5]
     recent_projects = user_projects.order_by('-updated_at')[:5]
     
@@ -104,10 +105,32 @@ def dashboard(request):
     
     return render(request, 'multianalysis/dashboard/dashboard.html', context)
 
-
+@login_required
 def analyze_saas(request):
-    return render(request, 'multianalysis/step_analysis.html')
+    user_input = request.GET.get('input', '').strip()  # Get input and strip spaces
 
+    if not user_input:
+        messages.error(request, "No input provided. Please enter a name or a website link.")
+    # Regex pattern to match only domain-based URLs (excluding IPs and localhost)
+    url_pattern = re.compile(
+        r'^(?:http|https)://'  # Match URLs starting with http:// or https://
+        r'([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'  # Match domains like example.com
+        r'(?:[/?#]\S*)?$',  # Allow query parameters, paths, etc.
+        re.IGNORECASE
+    )
+
+    if re.match(url_pattern, user_input):
+        url = user_input if user_input.startswith(('http://', 'https://')) else f'http://{user_input}'
+        name = ''
+    else:
+        name = user_input
+        url = ''
+
+    context = {
+        'name': name,
+        'url': url
+    }
+    return render(request, 'multianalysis/step_analysis.html', context)
 
 @login_required
 @csrf_exempt
@@ -123,24 +146,41 @@ def analyze_step(request):
         saas_name = data.get('saas_name')
         saas_url = data.get('saas_url', None)
         
-        # Check for an existing project in the session, or create a new one
+        # Add a "new_project" flag to explicitly create a new project
+        create_new = data.get('new_project', False)
+        
+        # Get project_id from session
         project_id = request.session.get('project_id')
         print("Session project_id:", project_id)
-        if project_id:
-            project = Project.objects.get(id=project_id)
-        else:
+        
+        # Create a new project if requested or if no project exists
+        if create_new or not project_id:
             project = Project.objects.create(
                 user=request.user,
                 name=saas_name if saas_name else "Untitled Project",
                 url=saas_url
             )
             request.session['project_id'] = project.id
-            project_id = project.id  # Update local variable
+            project_id = project.id
+        else:
+            try:
+                # Check if the project exists and belongs to the current user
+                project = Project.objects.get(id=project_id, user=request.user)
+            except Project.DoesNotExist:
+                # If project doesn't exist or doesn't belong to user, create a new one
+                project = Project.objects.create(
+                    user=request.user,
+                    name=saas_name if saas_name else "Untitled Project",
+                    url=saas_url
+                )
+                request.session['project_id'] = project.id
+                project_id = project.id
         
         # Retrieve any stored analyzer state from the session
         analyzer_data = request.session.get('analyzer_data', None)
+        
         # Instantiate the analyzer with the project instance, not just the id.
-        analyzer = MultiStepSaaSAnalyzer(project=project)
+        analyzer = MultiStepSaaSAnalyzer(project_id=project_id)
         
         # Populate analyzer with previous data if available
         if analyzer_data:
@@ -155,6 +195,14 @@ def analyze_step(request):
         # Execute the appropriate step
         if step == 'step1':
             result = analyzer.analyze_target_saas(saas_name, saas_url)
+            # If we're starting step 1, we should reset the analyzer data
+            analyzer_data = {
+                'target_saas': analyzer.target_saas,
+                'competitors': [],
+                'competitor_pain_points': [],
+                'combined_pain_points': [],
+                'micro_saas_ideas': []
+            }
         elif step == 'step2':
             result = analyzer.identify_competitors()
         elif step == 'step3':
@@ -167,31 +215,42 @@ def analyze_step(request):
         elif step == 'save':
             result = analyzer.save_analysis()
             request.session['last_analysis_file'] = result
+            # Clear the project_id from session after saving
+            if 'project_id' in request.session:
+                del request.session['project_id']
+            if 'analyzer_data' in request.session:
+                del request.session['analyzer_data']
         else:
             return JsonResponse({'error': 'Invalid step'}, status=400)
         
         # Store current analyzer state in the session
-        analyzer_data = {
-            'target_saas': analyzer.target_saas,
-            'competitors': analyzer.competitors,
-            'competitor_pain_points': analyzer.competitor_pain_points,
-            'combined_pain_points': analyzer.combined_pain_points,
-            'micro_saas_ideas': analyzer.micro_saas_ideas
-        }
-        request.session['analyzer_data'] = analyzer_data
+        if step != 'save':  # Don't update analyzer data if we just saved
+            analyzer_data = {
+                'target_saas': analyzer.target_saas,
+                'competitors': analyzer.competitors,
+                'competitor_pain_points': analyzer.competitor_pain_points,
+                'combined_pain_points': analyzer.combined_pain_points,
+                'micro_saas_ideas': analyzer.micro_saas_ideas
+            }
+            request.session['analyzer_data'] = analyzer_data
         
         return JsonResponse({
             'status': 'success',
             'step': step,
-            'result': result
+            'result': result,
+            'slug': project.slug,
+            'project_id': project_id  # Return the project ID in the response
         })
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@login_required
+def save_project(request):
+    return JsonResponse({'status': 'success', 'message': 'Analysis saved successfully'})
 
 @login_required
-def project(request, slug):
+def view_project(request, slug):
     """
     View analysis results based on the Project's slug.
     """
@@ -220,23 +279,21 @@ def project(request, slug):
         messages.error(request, f"Error viewing results: {str(e)}")
         return redirect('saas_analyzer:dashboard')
 
-
-def projects(request):
-    items = Project.objects.filter(user=request.user)
+@login_required
+def view_projects(request):
+    items = Project.objects.filter(user=request.user).order_by('-updated_at')
     context = {
         'items': items
     }
     return render(request, 'multianalysis/projects.html', context)
 
+@login_required
 def active_projects(request):
     items = Project.objects.filter(user=request.user, status=False)
     context = {
         'items': items
     }
     return render(request, 'multianalysis/projects.html', context)
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Project
 
 @login_required
 def micro_saas_ideas(request):

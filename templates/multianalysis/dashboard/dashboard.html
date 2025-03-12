@@ -141,14 +141,15 @@
     <!-- Quick Analysis Start -->
     <div class="columns">
       <div class="column is-12">
-        <div class="card">
+        <form action="{% url "saas_analyzer:analyze_saas" %}" class="card" method="GET">{% csrf_token %}
+          {% csrf_token %}
           <div class="card-content">
-            <h3 class="title is-5">Quick Analysis</h3>
-            <p class="subtitle is-6">Start analyzing a SaaS product right away</p>
+            <h3 class="title is-5">Quick Analysis/Project</h3>
+            <p class="subtitle is-6 mt-4">Analyze a SaaS for their pain points to get micro-SaaS opportunities</p>
             
             <div class="field has-addons">
               <div class="control is-expanded">
-                <input class="input" type="text" placeholder="Enter a SaaS product name or URL (e.g., notion.so)">
+                <input name="input" class="input" type="text" placeholder="Enter a SaaS product name or URL (e.g., notion.so)">
               </div>
               <div class="control">
                 <button class="button is-primary">
@@ -161,7 +162,7 @@
               Recent searches: Airtable, Mailchimp, Monday.com
             </p>
           </div>
-        </div>
+        </form>
       </div>
     </div>
     <!-- Quick Stats Section -->
@@ -245,11 +246,12 @@
                 </span>
                 <span>Filter</span>
               </button>
-              <a href="{% url 'saas_analyzer:analyze_saas' %}" class="button is-primary">
+              
+              <a href="{% url 'saas_analyzer:projects' %}" class="button is-text">
+                View All
                 <span class="icon is-small">
-                  <i class="fas fa-plus"></i>
+                  <i class="fas fa-arrow-right"></i>
                 </span>
-                <span>New Project</span>
               </a>
             </div>
           </div>
@@ -297,7 +299,7 @@
         </div>
         <div class="level-right">
           <div class="level-item">
-            <a href="#" class="button is-text">
+            <a href="{% url 'saas_analyzer:micro_saas_ideas' %}" class="button is-text">
               View All
               <span class="icon is-small">
                 <i class="fas fa-arrow-right"></i>

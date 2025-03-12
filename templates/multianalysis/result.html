@@ -26,6 +26,73 @@
       </div>
     </div>
 
+    <!-- Micro-SaaS Ideas Section -->
+    <div class="ideas-card card mb-5">
+      <div class="card-header">
+        <p class="card-header-title is-size-4">
+          <span class="icon mr-2">
+            <i class="fas fa-lightbulb"></i>
+          </span>
+          Recommended Micro-SaaS Opportunities
+        </p>
+      </div>
+      <div class="card-content">
+        {% if analysis.micro_saas_ideas %}
+          <div class="columns is-multiline">
+            {% for idea in analysis.micro_saas_ideas %}
+              <div class="column is-6">
+                <div class="box custom-box">
+                  <div class="idea-header">
+                    <h3 class="title is-5 has-text-primary">{{ idea.name }}</h3>
+                    <p class="subtitle is-6 mt-4 has-text-grey">{{ idea.tagline }}</p>
+                  </div>
+                  
+                  <div class="content mt-4">
+                    <p class="has-text-grey-dark">{{ idea.description }}</p>
+                    
+                    <div class="idea-meta mt-4">
+                      <div class="">
+                        <div class="meta-item">
+                          <span class="icon has-text-info">
+                            <i class="fas fa-users"></i>
+                          </span>
+                          <strong>Audience:</strong> 
+                          <p>{{ idea.target_audience }}</p>
+                        </div>
+                        <div class="meta-item">
+                          <span class="icon has-text-success">
+                            <i class="fas fa-star"></i>
+                          </span>
+                          <strong>Key Features:</strong>
+                          <p> {{ idea.key_features|join:", " }}</p>
+                        </div>
+                        <div class="meta-item">
+                          <span class="icon has-text-warning">
+                            <i class="fas fa-coins"></i>
+                          </span>
+                          <strong>Pricing Model:</strong> {{ idea.pricing_model }}
+                        </div>
+                        <div class="meta-item">
+                          <span class="icon has-text-danger">
+                            <i class="fas fa-hard-hat"></i>
+                          </span>
+                          <strong>Difficulty:</strong> {{ idea.implementation_difficulty }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="notification is-warning is-light">
+            No Micro-SaaS ideas generated in this analysis
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
     <!-- Target SaaS Section -->
     <div class="collapsible-card card mb-5">
       <div class="card-header collapsible-header">
@@ -46,10 +113,10 @@
           <div class="content">
             <div class="columns is-multiline">
               <div class="column is-half">
-                <h3 class="title is-5 has-text-grey">Basic Information</h3>
+                <h3 class="title is-5">Basic Information</h3>
                 <dl class="detail-list">
                   <dt>Name</dt>
-                  <dd>{{ analysis.target_saas.name }}</dd>
+                  <dd><strong>{{ analysis.target_saas.name }}</strong></dd>
                   
                   <dt>URL</dt>
                   <dd>
@@ -62,10 +129,14 @@
                     {% endif %}
                   </dd>
                 </dl>
+                <h3 class="title is-5">Differentiation</h3>
+                <p class="differential-factor">
+                  {{ analysis.target_saas.differential_factor }}
+                </p>
               </div>
 
               <div class="column is-half">
-                <h3 class="title is-5 has-text-grey">Audience & Features</h3>
+                <h3 class="title is-5">Audience & Features</h3>
                 <dl class="detail-list">
                   <dt>Target Audience</dt>
                   <dd>{{ analysis.target_saas.target_audience|join:", " }}</dd>
@@ -76,14 +147,7 @@
               </div>
 
               <div class="column is-full">
-                <h3 class="title is-5 has-text-grey">Differentiation</h3>
-                <p class="differential-factor">
-                  {{ analysis.target_saas.differential_factor }}
-                </p>
-              </div>
-
-              <div class="column is-full">
-                <h3 class="title is-5 has-text-grey">Pain Points</h3>
+                <h3 class="title is-5">Pain Points</h3>
                 {% if analysis.target_saas.pain_points %}
                   <div class="pain-points-grid">
                     {% for pain in analysis.target_saas.pain_points %}
@@ -175,10 +239,10 @@
       </div>
       <div class="collapsible-content is-collapsible">
         <div class="card-content">
-          <div class="columns">
+          <div class="">
             <!-- Patterns Column -->
-            <div class="column">
-              <h3 class="title is-5 has-text-grey mb-4">Common Patterns</h3>
+            <div class="">
+              <h3 class="title is-5 mb-4">Common Patterns</h3>
               {% if analysis.combined_pain_points.patterns %}
                 <div class="patterns-list">
                   {% for pattern in analysis.combined_pain_points.patterns %}
@@ -198,8 +262,8 @@
             </div>
 
             <!-- Market Gaps Column -->
-            <div class="column">
-              <h3 class="title is-5 has-text-grey mb-4">Identified Market Gaps</h3>
+            <div class=" mt-6">
+              <h3 class="title is-5 mb-4">Identified Market Gaps</h3>
               {% if analysis.combined_pain_points.market_gaps %}
                 <div class="gaps-list">
                   {% for gap in analysis.combined_pain_points.market_gaps %}
@@ -223,78 +287,14 @@
         </div>
       </div>
     </div>
-
-    <!-- Micro-SaaS Ideas Section -->
-    <div class="ideas-card card mb-5">
-      <div class="card-header">
-        <p class="card-header-title is-size-4">
-          <span class="icon mr-2">
-            <i class="fas fa-lightbulb"></i>
-          </span>
-          Recommended Micro-SaaS Opportunities
-        </p>
-      </div>
-      <div class="card-content">
-        {% if analysis.micro_saas_ideas %}
-          <div class="ideas-grid">
-            {% for idea in analysis.micro_saas_ideas %}
-              <div class="idea-card box">
-                <div class="idea-header">
-                  <h3 class="title is-5 has-text-primary">{{ idea.name }}</h3>
-                  <p class="subtitle is-6 has-text-grey">{{ idea.tagline }}</p>
-                </div>
-                
-                <div class="content">
-                  <p class="has-text-grey-dark">{{ idea.description }}</p>
-                  
-                  <div class="idea-meta mt-4">
-                    <div class="columns is-multiline">
-                      <div class="column is-half">
-                        <div class="meta-item">
-                          <span class="icon has-text-info">
-                            <i class="fas fa-users"></i>
-                          </span>
-                          <strong>Audience:</strong> {{ idea.target_audience }}
-                        </div>
-                        <div class="meta-item">
-                          <span class="icon has-text-success">
-                            <i class="fas fa-star"></i>
-                          </span>
-                          <strong>Key Features:</strong> {{ idea.key_features|join:", " }}
-                        </div>
-                      </div>
-                      
-                      <div class="column is-half">
-                        <div class="meta-item">
-                          <span class="icon has-text-warning">
-                            <i class="fas fa-coins"></i>
-                          </span>
-                          <strong>Pricing Model:</strong> {{ idea.pricing_model }}
-                        </div>
-                        <div class="meta-item">
-                          <span class="icon has-text-danger">
-                            <i class="fas fa-hard-hat"></i>
-                          </span>
-                          <strong>Difficulty:</strong> {{ idea.implementation_difficulty }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="notification is-warning is-light">
-            No Micro-SaaS ideas generated in this analysis
-          </div>
-        {% endif %}
-      </div>
-    </div>
   </div>
 </section>
 
 <style>
+  .custom-box{
+    box-shadow:  none !important;
+    border: 1px solid ;
+  }
   .collapsible-card {
     transition: all 0.3s ease;
     border: 1px solid #eee;
@@ -306,7 +306,7 @@
   }
 
   .collapsible-header:hover {
-    background-color: #f9f9f9;
+    background-color:#1f22298f;
   }
 
   .is-collapsible {
@@ -366,13 +366,11 @@
 
   .detail-list dt {
     font-weight: 600;
-    color: #4a4a4a;
     margin-top: 0.5rem;
   }
 
   .detail-list dd {
     margin-left: 1rem;
-    color: #666;
   }
 </style>
 

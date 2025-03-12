@@ -315,7 +315,7 @@ class MultiStepSaaSAnalyzer:
         prompt = f"""
         You are a SaaS product strategist developing micro-SaaS ideas based on identified market gaps.
         
-        TARGET SAAS MARKET: {self.target_saas}
+        
 
         IDENTIFIED MARKET GAPS:
         {gaps_summary}
@@ -409,7 +409,9 @@ class MultiStepSaaSAnalyzer:
             self.project.save()
 
             print("\nComplete analysis saved to the Project model.")
-            return self.project
+            analysis['slug'] = self.project.slug
+            analysis['name'] = self.project.name
+            return analysis
         except Exception as e:
             print(f"Error saving analysis to model: {str(e)}")
             return None
@@ -563,22 +565,7 @@ class MultiStepSaaSAnalyzer:
             print(f"   Validation: {idea['validation']}")
             print(f"   Implementation Difficulty: {idea['implementation_difficulty']}/10")
 
-# Example usage with Django integration
-'''
-# Create a new project and run analysis
-from .models import Project
-from django.contrib.auth.models import User
 
-user = User.objects.get(id=1)  # Get a user
-project = Project.objects.create(user=user, name="Initial Project")
-analyzer = MultiStepSaaSAnalyzer(project_id=project.id)
-result = analyzer.full_analysis("Zoom", "https://zoom.us")
-
-# Or continue an existing analysis
-existing_project = Project.objects.get(id=123)
-analyzer = MultiStepSaaSAnalyzer(project_id=existing_project.id)
-analyzer.generate_micro_saas_ideas()  # Continue from where it left off
-'''
 
 # Example usage
 if __name__ == "__main__":

@@ -9,10 +9,11 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name = "dashboard"),
     path('analyze/', views.analyze_saas, name='analyze_saas'), #New project here
     path('analyze-step/', views.analyze_step, name ='analyze_step'),
-    path('projects/', views.projects, name='projects'), #List of projects
+    path("save-project/", views.save_project, name="save_project"),
+    path('projects/', views.view_projects, name='projects'), #List of projects
     path('active-projects/', views.active_projects, name='active_projects'), #List of active projects
     path('micro-saas-ideas/', views.micro_saas_ideas, name='micro_saas_ideas'), #List of micro saas ideas
-    path('project/<slug:slug>/', views.project, name='project_detail'),
+    path('project/<slug:slug>/', views.view_project, name='project_detail'),
 ]
 
 # Add to your project's main urls.py:

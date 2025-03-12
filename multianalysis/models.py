@@ -22,6 +22,21 @@ class Project(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    last_completed_step = models.CharField(
+        max_length=20, 
+        choices=[
+            ('step1', 'Target SaaS Analysis'),
+            ('step2', 'Competitor Identification'),
+            ('step3', 'Pain Points Analysis'),
+            ('step4', 'Combined Pain Points'),
+            ('step5', 'Micro SaaS Ideas'),
+            ('complete', 'Analysis Complete')
+        ],
+        default='',
+        blank=True,
+        null=True
+    )
     
     def save(self, *args, **kwargs):
         # Generate slug from the target_saas_name if not already provided.
