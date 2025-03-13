@@ -1,320 +1,324 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login as auth_login
+from django.http import JsonResponse, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.contrib import messages
-from django.http import HttpResponseBadRequest, JsonResponse
-
-from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-
-from analysis.analyzer import gen
 import json
-from django.core.validators import URLValidator
-from django.core.exceptions import ValidationError
 import re
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from datetime import timedelta
+from django.utils import timezone
+from django.contrib import messages
 
 
-from .forms import *
+# Import the MultiStepSaaSAnalyzer
+from services.utils import MultiStepSaaSAnalyzer
 from .models import *
 
-saas_data = [
-        {
-            "name": "PhotoAI",
-            "url": "https://photoai.com",
-            "category": "AI Imaging",
-            "description": "AI-powered platform for generating photorealistic images and videos from selfies.",
-            "pain_point_score": 5,
-            "key_pain_points": [
-                "Complex interface for new users",
-                "Limited customization options",
-                "High processing times for large batches"
-            ]
-        },
-        {
-            "name": "Jasper AI",
-            "url": "https://www.jasper.ai",
-            "category": "AI Writing",
-            "description": "AI-driven copywriting tool for generating marketing and content materials.",
-            "pain_point_score": 3,
-            "key_pain_points": [
-                "Inconsistent content quality",
-                "Limited tone control",
-                "Integration challenges"
-            ]
-        },
-        {
-            "name": "Synthesia",
-            "url": "https://www.synthesia.io",
-            "category": "AI Video",
-            "description": "Create AI-powered video content with synthetic avatars and voiceovers.",
-            "pain_point_score": 4,
-            "key_pain_points": [
-                "Limited language support",
-                "Challenging avatar customization",
-                "High video rendering times"
-            ]
-        },
-        {
-            "name": "Copy.ai",
-            "url": "https://www.copy.ai",
-            "category": "Content Creation",
-            "description": "AI-powered copywriting tool for generating creative marketing content.",
-            "pain_point_score": 3,
-            "key_pain_points": [
-                "Repetitive content suggestions",
-                "Limited industry templates",
-                "Lack of advanced integrations"
-            ]
-        },
-        {
-            "name": "Gamma",
-            "url": "https://gamma.app",
-            "category": "Presentations",
-            "description": "Interactive presentation tool for creating dynamic and engaging slides.",
-            "pain_point_score": 4,
-            "key_pain_points": [
-                "Steep learning curve",
-                "Limited advanced design features",
-                "Performance lags with complex slides"
-            ]
-        },
-        {
-            "name": "Descript",
-            "url": "https://www.descript.com",
-            "category": "Audio/Video",
-            "description": "All-in-one tool for audio and video editing with AI-powered transcription.",
-            "pain_point_score": 4,
-            "key_pain_points": [
-                "Occasional transcription inaccuracies",
-                "High resource usage",
-                "Limited advanced editing features"
-            ]
-        },
-        {
-            "name": "Loom",
-            "url": "https://www.loom.com",
-            "category": "Video Messaging",
-            "description": "Video messaging tool for instant communication and screen recording.",
-            "pain_point_score": 2,
-            "key_pain_points": [
-                "Basic editing capabilities",
-                "Occasional syncing issues",
-                "Limited recording customization"
-            ]
-        },
-        {
-            "name": "Notion",
-            "url": "https://www.notion.so",
-            "category": "Productivity",
-            "description": "All-in-one workspace for notes, docs, and project management.",
-            "pain_point_score": 3,
-            "key_pain_points": [
-                "Steep learning curve",
-                "Limited offline functionality",
-                "Performance issues with large datasets"
-            ]
-        },
-        {
-            "name": "Figma",
-            "url": "https://www.figma.com",
-            "category": "Design",
-            "description": "Collaborative interface design tool for modern digital products.",
-            "pain_point_score": 2,
-            "key_pain_points": [
-                "Slow collaboration features",
-                "Limited offline support",
-                "Occasional UI inconsistencies"
-            ]
-        }
-    ]
-
-def index(request):    
-    context = {
-        'saas_data': saas_data
-        }
-    
-    return render(request, 'index.html', context)
-
+def index(request):
+    return render(request, 'index.html')
 def pricing(request):
     return render(request, 'pricing.html')
 
+
 @login_required
 def dashboard(request):
-    # Get analyses for the current user only, ordered by newest first
-    saas_data = SaaSAnalysis.objects.filter(
-        user=request.user
-    ).order_by('-created_at')
+    """
+    Dashboard view for SaaS Analyzer.
+    Displays user projects and extra statistics:
+      - Total Projects (with % change from last month)
+      - Active Analyses (with count of new ones this week)
+      - Generated Ideas (with count of new ideas this month)
+      - Pain Points Identified (with a note on growth)
+    """
+    # Retrieve all projects for the logged-in user
+    user_projects = Project.objects.filter(user=request.user)
+    ideas = []
+    
+    # Main dashboard items
+    projects = user_projects.order_by('-updated_at')[:6]
+    activities = user_projects.order_by('-created_at')[:5]
+    recent_projects = user_projects.order_by('-updated_at')[:5]
+    
+    # Statistics: total and active projects
+    total_projects = user_projects.count()
+    active_projects = user_projects.filter(status=False).count()
+    
+    # Date boundaries
+    now = timezone.now()
+    start_of_week = now - timedelta(days=now.weekday())  # Monday of current week
+    start_of_month = now.replace(day=1)
+    
+    # New projects from last month: using created_at filtering on previous calendar month
+    if now.month == 1:
+        last_month = 12
+        last_month_year = now.year - 1
+    else:
+        last_month = now.month - 1
+        last_month_year = now.year
+    new_projects_last_month = Project.objects.filter(
+        user=request.user, 
+        created_at__year=last_month_year, 
+        created_at__month=last_month
+    ).count()
+    
+    # New projects this week (active analyses that started this week)
+    new_projects_this_week = user_projects.filter(created_at__gte=start_of_week).count()
+    
+    # Aggregated Generated Ideas: sum of lengths of micro_saas_ideas (assuming each is a list)
+    generated_ideas = sum(len(p.micro_saas_ideas) if p.micro_saas_ideas else 0 for p in user_projects)
+    
+    # New ideas this month: for projects updated since the start of this month,
+    # count ideas for those projects (this is one way to approximate "new ideas")
+    projects_this_month = user_projects.filter(updated_at__gte=start_of_month)
+    new_ideas_this_month = sum(len(p.micro_saas_ideas) if p.micro_saas_ideas else 0 for p in projects_this_month)
+    
+    # Aggregated Pain Points Identified across projects:
+    pain_points = 0
+    for project in user_projects:
+        # Count pain points from the target SaaS analysis
+        if project.target_saas and isinstance(project.target_saas, dict):
+            pain_points += len(project.target_saas.get('pain_points', []))
+        # Count pain points from competitor analyses
+        if project.competitor_pain_points and isinstance(project.competitor_pain_points, dict):
+            for pain_list in project.competitor_pain_points.values():
+                pain_points += len(pain_list)
+
+    for project in projects:
+        # Each project has a JSON field `micro_saas_ideas` that is a list of ideas
+        for idea in project.micro_saas_ideas:
+            # Optionally attach the project name to each idea for context
+            idea['project_name'] = project.name
+            ideas.append(idea)
+    
+    # For demonstration, use a placeholder for percentage change from last month.
+    # You might compute this from historical data.
+    project_change_percentage = "25%"  # Example placeholder
     
     context = {
-        'saas_data': saas_data
+        'projects': projects,
+        'activities': activities,
+        'recent_projects': recent_projects,
+        'total_projects': total_projects,
+        'active_projects': active_projects,
+        'project_change_percentage': project_change_percentage,  # e.g., "25% from last month"
+        'new_projects_last_month': new_projects_last_month,        # could be shown alongside total projects
+        'new_projects_this_week': new_projects_this_week,          # e.g., "2 new this week"
+        'generated_ideas': generated_ideas,
+        'new_ideas_this_month': new_ideas_this_month,              # e.g., "12 new this month"
+        'pain_points_identified': pain_points,                     # e.g., "87 Growing database"
+        'items': ideas,
     }
+    
     return render(request, 'dashboard/dashboard.html', context)
 
-
-
 @login_required
-def analysis_detail(request, slug):
-    analysis = get_object_or_404(SaaSAnalysis, slug=slug, user=request.user)
+def analyze_saas(request):
+    user_input = request.GET.get('input', '').strip()  # Get input and strip spaces
+
+    if not user_input:
+        messages.error(request, "No input provided. Please enter a name or a website link.")
+    # Regex pattern to match only domain-based URLs (excluding IPs and localhost)
+    url_pattern = re.compile(
+        r'^(?:http|https)://'  # Match URLs starting with http:// or https://
+        r'([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})'  # Match domains like example.com
+        r'(?:[/?#]\S*)?$',  # Allow query parameters, paths, etc.
+        re.IGNORECASE
+    )
+
+    if re.match(url_pattern, user_input):
+        url = user_input if user_input.startswith(('http://', 'https://')) else f'http://{user_input}'
+        name = ''
+    else:
+        name = user_input
+        url = ''
+
     context = {
-        'analysis_data': analysis.analysis_result,
-        'has_data': bool(analysis.analysis_result)
+        'name': name,
+        'url': url
     }
-    return render(request, 'dashboard/analysis_detail.html', context)
+    return render(request, 'step_analysis.html', context)
 
 @login_required
-def analysis_export(request, slug):
-    analysis = get_object_or_404(SaaSAnalysis, slug=slug, user=request.user)
-    # Your export logic here
-
-
-
-
-@login_required
-def analysis(request):
-    context = {
-        'form_errors': {},
-        'analysis_data': None
-    }
-    
-    if request.method == "POST":
-        # Get form data
-        name = request.POST.get('name', '').strip()
-        url = request.POST.get('url', '').strip()
-        description = request.POST.get('description', '').strip()
-        
-        # Validate inputs
-        if not name:
-            context['form_errors']['name'] = 'Product name is required'
-        
-        if not url:
-            context['form_errors']['url'] = 'Product URL is required'
-        else:
-            # Validate URL format
-            url_validator = URLValidator()
-            try:
-                # Add http:// if not present for validation
-                if not url.startswith(('http://', 'https://')):
-                    url = 'http://' + url
-                url_validator(url)
-            except ValidationError:
-                context['form_errors']['url'] = 'Please enter a valid URL'
-        
-        # If no errors, proceed with analysis
-        if not context['form_errors']:
-            try:
-                # Get analysis results
-                result = gen(name, url)
-                
-                # Debug print
-                print("Raw result:", result)
-                
-                # Clean and parse the JSON
-                try:
-                    # Method 1: Extract JSON string if wrapped in code blocks
-                    if "```json" in result:
-                        # Extract content between ```json and ```
-                        json_str = re.search(r'```json\n(.*?)\n```', result, re.DOTALL)
-                        if json_str:
-                            result = json_str.group(1)
-                    elif "```" in result:
-                        # Extract content between ``` and ```
-                        json_str = re.search(r'```\n(.*?)\n```', result, re.DOTALL)
-                        if json_str:
-                            result = json_str.group(1)
-                    
-                    # Method 2: Clean the string
-                    result = result.strip()
-                    if result.startswith('`') and result.endswith('`'):
-                        result = result[1:-1]
-                    
-                    # Parse JSON
-                    analysis_data = json.loads(result)
-                    # print("Parsed data:", analysis_data)  # Debug print
-                    context['analysis_data'] = analysis_data
-                    
-                except json.JSONDecodeError as e:
-                    print("JSON Decode Error:", str(e))  # Debug print
-                    print("Attempted to parse:", result)  # Debug print
-                    context['error_message'] = f'Error processing analysis results: {str(e)}'
-                    
-            except Exception as e:
-                print("General Error:", str(e))  # Debug print
-                context['error_message'] = f'Error performing analysis: {str(e)}'
-        
-        # Add form data back to context for form repopulation
-        context.update({
-            'name': name,
-            'url': url,
-            'description': description
-        })
-    
-    return render(request, 'dashboard/analysis.html', context)
-
-
-
-@login_required
-def analysis_api(request):
-    if request.method != "POST":
-        return JsonResponse({"message": "Method not allowed"}, status=405)
-    
+@csrf_exempt
+@require_http_methods(["POST"])
+def analyze_step(request):
+    """
+    Handle step-by-step analysis requests.
+    """
     try:
         data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return JsonResponse({"error": "Invalid JSON in request body."}, status=400)
-    
-    name = data.get('name', '').strip()
-    url = data.get('url', '').strip()
-    
-    form_errors = {}
-    
-    if not name:
-        form_errors['name'] = 'Product name is required'
-    
-    if not url:
-        form_errors['url'] = 'Product URL is required'
-    else:
-        url_validator = URLValidator()
-        try:
-            if not url.startswith(('http://', 'https://')):
-                url = 'http://' + url
-            url_validator(url)
-        except ValidationError:
-            form_errors['url'] = 'Please enter a valid URL'
-    
-    if form_errors:
-        return JsonResponse({"form_errors": form_errors}, status=400)
-    
-    try:
-        response_data = gen(name, url)
-    
-        saas_data_json = response_data['saas_data_json']
-        search_queries = response_data['search_queries']
-        token_info = response_data['token_info']
-        # print(saas_data_json)
-        description = saas_data_json.get('saas_product', {}).get('description', '')
-        # print(description)
-
-        # Save analysis result
-        analysis = SaaSAnalysis.objects.create(
-            user=request.user,
-            product_url=url,
-            product_name=name,
-            search_queries = search_queries,
-            description=description,
-            analysis_result=saas_data_json
-        )
+        print(data)
+        step = data.get('step')
+        saas_name = data.get('saas_name')
+        saas_url = data.get('saas_url', None)
         
-        return JsonResponse({ 
-            "slug": analysis.slug,
-            "result": saas_data_json
-        }, status=201) 
+        # Add a "new_project" flag to explicitly create a new project
+        create_new = data.get('new_project', False)
         
-    except json.JSONDecodeError as e:
+        # Get project_id from session
+        project_id = request.session.get('project_id')
+        print("Session project_id:", project_id)
+        
+        # Create a new project if requested or if no project exists
+        if create_new or not project_id:
+            project = Project.objects.create(
+                user=request.user,
+                name=saas_name if saas_name else "Untitled Project",
+                url=saas_url
+            )
+            request.session['project_id'] = project.id
+            project_id = project.id
+        else:
+            try:
+                # Check if the project exists and belongs to the current user
+                project = Project.objects.get(id=project_id, user=request.user)
+            except Project.DoesNotExist:
+                # If project doesn't exist or doesn't belong to user, create a new one
+                project = Project.objects.create(
+                    user=request.user,
+                    name=saas_name if saas_name else "Untitled Project",
+                    url=saas_url
+                )
+                request.session['project_id'] = project.id
+                project_id = project.id
+        
+        # Retrieve any stored analyzer state from the session
+        analyzer_data = request.session.get('analyzer_data', None)
+        
+        # Instantiate the analyzer with the project instance, not just the id.
+        analyzer = MultiStepSaaSAnalyzer(project_id=project_id)
+        
+        # Populate analyzer with previous data if available
+        if analyzer_data:
+            analyzer.target_saas = analyzer_data.get('target_saas', analyzer.target_saas)
+            analyzer.competitors = analyzer_data.get('competitors', analyzer.competitors)
+            analyzer.competitor_pain_points = analyzer_data.get('competitor_pain_points', analyzer.competitor_pain_points)
+            analyzer.combined_pain_points = analyzer_data.get('combined_pain_points', analyzer.combined_pain_points)
+            analyzer.micro_saas_ideas = analyzer_data.get('micro_saas_ideas', analyzer.micro_saas_ideas)
+        
+        result = None
+        
+        # Execute the appropriate step
+        if step == 'step1':
+            result = analyzer.analyze_target_saas(saas_name, saas_url)
+            # If we're starting step 1, we should reset the analyzer data
+            analyzer_data = {
+                'target_saas': analyzer.target_saas,
+                'competitors': [],
+                'competitor_pain_points': [],
+                'combined_pain_points': [],
+                'micro_saas_ideas': []
+            }
+        elif step == 'step2':
+            result = analyzer.identify_competitors()
+        elif step == 'step3':
+            result = analyzer.analyze_competitor_pain_points()
+        elif step == 'step4':
+            result = analyzer.combine_pain_points()
+        elif step == 'step5':
+            max_ideas = int(data.get('max_ideas', 3))
+            result = analyzer.generate_micro_saas_ideas(max_ideas)
+        elif step == 'save':
+            result = analyzer.save_analysis()
+            request.session['last_analysis_file'] = result
+            # Clear the project_id from session after saving
+            if 'project_id' in request.session:
+                del request.session['project_id']
+            if 'analyzer_data' in request.session:
+                del request.session['analyzer_data']
+        else:
+            return JsonResponse({'error': 'Invalid step'}, status=400)
+        
+        # Store current analyzer state in the session
+        if step != 'save':  # Don't update analyzer data if we just saved
+            analyzer_data = {
+                'target_saas': analyzer.target_saas,
+                'competitors': analyzer.competitors,
+                'competitor_pain_points': analyzer.competitor_pain_points,
+                'combined_pain_points': analyzer.combined_pain_points,
+                'micro_saas_ideas': analyzer.micro_saas_ideas
+            }
+            request.session['analyzer_data'] = analyzer_data
+        
         return JsonResponse({
-            "error": f"Error processing analysis results: {str(e)}",
-            "raw_result": result if isinstance(result, str) else str(result)
-        }, status=500)
+            'status': 'success',
+            'step': step,
+            'result': result,
+            'slug': project.slug,
+            'project_id': project_id  # Return the project ID in the response
+        })
+        
     except Exception as e:
-        return JsonResponse({
-            "error": f"Error performing analysis: {str(e)}"
-        }, status=500)
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def save_project(request):
+    return JsonResponse({'status': 'success', 'message': 'Analysis saved successfully'})
+
+@login_required
+def view_project(request, slug):
+    """
+    View analysis results based on the Project's slug.
+    """
+    try:
+        # Retrieve the project by slug, ensuring it belongs to the logged-in user.
+        project = get_object_or_404(Project, slug=slug, user=request.user)
+        
+        # Prepare the analysis data from the Project instance.
+        analysis_data = {
+            'target_saas': project.target_saas,
+            'competitors': project.competitors,
+            'competitor_pain_points': project.competitor_pain_points,
+            'combined_pain_points': project.combined_pain_points,
+            'micro_saas_ideas': project.micro_saas_ideas,
+            'created_at': project.created_at,
+            'updated_at': project.updated_at,
+        }
+        
+        # Render the template with the analysis data.
+        return render(request, 'result.html', {
+            'analysis': analysis_data,
+            'project': project
+        })
+        
+    except Exception as e:
+        messages.error(request, f"Error viewing results: {str(e)}")
+        return redirect('saas_analyzer:dashboard')
+
+@login_required
+def view_projects(request):
+    items = Project.objects.filter(user=request.user).order_by('-updated_at')
+    context = {
+        'items': items
+    }
+    return render(request, 'projects.html', context)
+
+@login_required
+def active_projects(request):
+    items = Project.objects.filter(user=request.user, status=False)
+    context = {
+        'items': items
+    }
+    return render(request, 'projects.html', context)
+
+@login_required
+def micro_saas_ideas(request):
+    # Get all projects for the current user
+    projects = Project.objects.filter(user=request.user)
+    ideas = []
+    
+    # Iterate over each project and aggregate micro SaaS ideas
+    for project in projects:
+        # Each project has a JSON field `micro_saas_ideas` that is a list of ideas
+        for idea in project.micro_saas_ideas:
+            # Optionally attach the project name to each idea for context
+            idea['project_name'] = project.name
+            ideas.append(idea)
+    
+    context = {
+        'items': ideas  # This list now contains all micro SaaS ideas from the user's projects
+    }
+    
+    return render(request, 'micro_saas_ideas.html', context)

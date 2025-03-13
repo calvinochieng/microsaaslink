@@ -178,31 +178,31 @@
   <nav class="sidebar-nav">
       <ul class="menu-list">
         <li>
-          <a href="/saas-analyzer/dashboard/" class="is-active">
+          <a href="{% url 'dashboard'%}" class="is-active">
             <span class="icon"><i class="fas fa-home fa-fw"></i></span>
             <span class="menu-text">Dashboard</span>
           </a>
         </li>
         <li>
-          <a href="{% url 'saas_analyzer:analyze_saas' %}" >
+          <a href="{% url 'analyze_saas' %}" >
             <span class="icon"><i class="fas fa-add fa-fw" ></i></span>
             <span class="menu-text">New Project</span>
           </a>
         </li>
         <li>
-          <a href="{% url 'saas_analyzer:projects' %}">
+          <a href="{% url 'projects' %}">
             <span class="icon"><i class="fas fa-project-diagram fa-fw"></i></span>
             <span class="menu-text">Projects</span>
           </a>
         </li>
         <li>
-          <a href="{% url 'saas_analyzer:active_projects' %}">
+          <a href="{% url 'active_projects' %}">
             <span class="icon"><i class="fas fa-tasks fa-fw"></i></span>
             <span class="menu-text">Active Projects</span>
           </a>
         </li>
         <li>
-          <a href="{% url 'saas_analyzer:micro_saas_ideas' %}">
+          <a href="{% url 'micro_saas_ideas' %}">
             <span class="icon"><i class="fas fa-lightbulb fa-fw"></i></span>
             <span class="menu-text">Generated Ideas</span>
           </a>
@@ -220,7 +220,7 @@
           
           {% for project in projects %}
           <li class="recents">
-            <a href="{% url 'saas_analyzer:project_detail' project.slug %}">
+            <a href="{% url 'project_detail' project.slug %}">
               <span class="menu-text"> {{project.name}}</span>
             </a>
           </li>

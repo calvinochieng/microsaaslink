@@ -1,4 +1,4 @@
-{% extends "multianalysis/dashboard/dashboard.html" %}
+{% extends "dashboard/dashboard.html" %}
 
 {% block title %}SaaS Analysis Results{% endblock %}
 
@@ -26,8 +26,8 @@
               </div>
             </div>
             <footer class="card-footer">
-              <a href="{% url 'saas_analyzer:project_detail' project.slug %}" class="card-footer-item is-size-7">Continue Analysis</a>
-              <a href="{% url 'saas_analyzer:project_detail' project.slug %}" class="card-footer-item is-size-7">View Details</a>
+              <a href="{% url 'project_detail' project.slug %}" class="card-footer-item is-size-7">Continue Analysis</a>
+              <a href="{% url 'project_detail' project.slug %}" class="card-footer-item is-size-7">View Details</a>
             </footer>
           </div>
         </div>

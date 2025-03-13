@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 class MultiStepSaaSAnalyzer:
     def __init__(self, project_id=None, api_key=None):
         """Initialize the SaaS Analyzer with a Gemini API key and project ID"""
-        from multianalysis.models import Project  # Import here to avoid circular imports
+        from app.models import Project  # Import here to avoid circular imports
         
         self.api_key = api_key or config("GEMINI_API_KEY")
         self.client = genai.Client(api_key=self.api_key)
@@ -314,8 +314,6 @@ class MultiStepSaaSAnalyzer:
 
         prompt = f"""
         You are a SaaS product strategist developing micro-SaaS ideas based on identified market gaps.
-        
-        
 
         IDENTIFIED MARKET GAPS:
         {gaps_summary}

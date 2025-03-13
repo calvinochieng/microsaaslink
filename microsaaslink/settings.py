@@ -8,7 +8,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 
 DEBUG = True or  config('DEBUG',  cast=bool)
-LOCAL = True
+LOCAL = False
 
 PRODUCTION_MODE = config('PRODUCTION_MODE',cast=bool)
 
@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'cloudinary',
     # Local Apps
     'app',
-    'multianalysis',
 ]
 
 
@@ -164,8 +163,20 @@ if LOCAL:
     }
 else:
     DATABASES = {
-    'default': dj_database_url.config(default=env('DATABASE_URL_SUPERBASE'),conn_max_age=600)
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres.hdfxpccuiixjkdtepxle',
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': 'aws-0-eu-central-1.pooler.supabase.com',
+            'PORT': '5432',
+            'OPTIONS': {
+                'sslmode': 'require',
+            }
+        }
     }
+    # print("databases", DATABASES)
+
 
 
 AUTH_PASSWORD_VALIDATORS = [

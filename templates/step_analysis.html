@@ -1,4 +1,4 @@
-{% extends 'multianalysis/dashboard/dashboard.html' %}
+{% extends 'dashboard/dashboard.html' %}
 {% load static %}
 
 {% block custom_styles %}
@@ -254,7 +254,7 @@
       const submitBtn = this.querySelector('button[type="submit"]');
       disableButton(submitBtn, "Analyzing...");
       
-      fetch('/saas-analyzer/analyze-step/', {
+      fetch('/analyze-step/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -311,7 +311,7 @@
       const btn = this;
       disableButton(btn, "Identifying...");
       
-      fetch('/saas-analyzer/analyze-step/', {
+      fetch('/analyze-step/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ step: 'step2' })
@@ -359,7 +359,7 @@
       const btn = this;
       disableButton(btn, "Analyzing...");
       
-      fetch('/saas-analyzer/analyze-step/', {
+      fetch('/analyze-step/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ step: 'step3' })
@@ -422,7 +422,7 @@
       const btn = this;
       disableButton(btn, "Identifying...");
       
-      fetch('/saas-analyzer/analyze-step/', {
+      fetch('/analyze-step/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ step: 'step4' })
@@ -496,7 +496,7 @@
       disableButton(btn, "Generating...");
       const ideaCount = document.getElementById('ideaCount').value;
       
-      fetch('/saas-analyzer/analyze-step/', {
+      fetch('/analyze-step/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ step: 'step5', idea_count: ideaCount })
@@ -558,7 +558,7 @@
       disableButton(btn, "Saving...");
       
       // If needed, include the project ID in the payload. Otherwise, ensure the backend uses session data.
-      fetch('/saas-analyzer/analyze-step/', {
+      fetch('/analyze-step/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ step: 'save' })
@@ -568,7 +568,7 @@
         if (data.status === 'success') {
           alert('Analysis results saved successfully!');
           // Assuming data.result_file is the slug or identifier
-          window.location.href = `/saas-analyzer/project/${data.slug}/`;
+          window.location.href = `/project/${data.slug}/`;
         } else {
           alert('Error: ' + (data.error || 'Failed to save results'));
           enableButton(btn);
