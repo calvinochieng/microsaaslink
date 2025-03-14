@@ -59,14 +59,14 @@
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css" >
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">    
     <link rel="stylesheet" href="{% static 'app/styles.css' %}">
     {% block custom_styles %}{% endblock custom_styles %}
     <script defer src="https://cloud.umami.is/script.js" data-website-id="83fb281a-fd05-4d48-8543-7ad5161ce835"></script>
 </head>
 <body>
      <!-- Navigation Bar -->
-  <nav class="navbar is-transparent">
+  <nav class="navbar is-primary" style="overflow: hidden;">
    <div class="container">
     <div class="navbar-brand">
         <a class="navbar-item" href="/">
@@ -118,38 +118,165 @@
     {% endblock content %}
         
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container"> 
-            <div class="columns">
-                <div class="column">
-                    <h4 class="title has-text-white is-size-4">Quick Links</h4>
-                    <ul>                           
-                        <li><a href="/#"></a></li>
-                    </ul>
-                    
-                    <p>
-                        <a href="/about">About</a> | <a href="/#features">Features</a> | <a href="{% url 'pricing'%}">Pricing</a> | <a href="#">Contact</a>
-                    </p>
+<footer class="footer has-background-dark pt-6 pb-4">
+    <div class="container">
+        <div class="columns is-multiline">
+            <!-- Logo and Mission -->
+            <div class="column is-4">
+                <div class="footer-brand mb-4">
+                    <img src=" {% static "app/images/icon.png" %}" alt="Microsaaslink" class="footer-logo mb-3" width="150">
+                    <p class="has-text-grey-light mb-4">Discover untapped market opportunities by analyzing user feedback from existing SaaS products.</p>
                 </div>
-                <div class="column">
-                    <h4 class="title has-text-white is-size-4">Partner Websites</h4>
-                    <ul>
-                        <li><a href="https://xtuls.com/">Xtuls</a></li>
-                        <li><a href="https://5munlocked.ink/">5MUnlocked</a></li>
-                    </ul>
-                </div>
-                <div class="column">
-                    <h4 class="title has-text-white is-size-4">Social Links</h4>
-                    <div class="social-icons">
-                        <a href="https://x.com/calvinochieng" class="icon is-medium"><i class="fab fa-x-twitter"></i></a>
+                <div class="newsletter-signup">
+                    <p class="has-text-turquoise mb-2"><strong>Get micro-SaaS opportunities in your inbox</strong></p>
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <input class="input" type="email" placeholder="Your email">
+                        </div>
+                        <div class="control">
+                            <button class="button is-turquoise">Subscribe</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="content has-text-centered">
-                <p>&copy; <span id="year"></span> Microsaas Link. All rights reserved.</p>
+            
+            <!-- Quick Links -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="/" class="has-text-light">Home</a></li>
+                    <li><a href="/#features" class="has-text-light">Features</a></li>
+                    <li><a href="/#how-it-works" class="has-text-light">How It Works</a></li>
+                    <li><a href="{% url 'pricing' %}" class="has-text-light">Pricing</a></li>
+                    <li><a href="/about" class="has-text-light">About Us</a></li>
+                    <li><a href="/blog" class="has-text-light">Blog</a></li>
+                </ul>
+            </div>
+            
+            <!-- Partner Websites -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Partners</h4>
+                <ul class="footer-links">
+                    <li><a href="https://5munlocked.ink/" target="_blank" rel="noopener" class="has-text-light">5MUnlocked</a></li>
+                    <li><a href="https://microsaasl.ink/" target="_blank" rel="noopener" class="has-text-light">MicrosaasLink</a></li>
+                    <li><a href="https://xtuls.com/" target="_blank" rel="noopener" class="has-text-light">Xtuls</a></li>
+                </ul>
+            </div>
+            
+            <!-- Support & Legal -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'terms_of_service' %}" class="has-text-light">Terms of Service</a></li>
+                    <li><a href="{% url 'privacy_policy' %}" class="has-text-light">Privacy Policy</a></li>
+                    <li><a href="{% url 'refund_policy' %}" class="has-text-light">Refund Policy</a></li>
+                    <li><a href="{% url 'contact' %}" class="has-text-light">Contact Support</a></li>
+                    {% comment %} <li><a href="{% url 'faq' %}" class="has-text-light">FAQ</a></li> {% endcomment %}
+                </ul>
+            </div>
+            
+            <!-- Social Links -->
+            <div class="column is-2">
+                <h4 class="footer-heading has-text-turquoise mb-4">Connect</h4>
+                <div class="social-icons mb-4">
+                    <a href="https://x.com/calvinochieng_" target="_blank" rel="noopener" class="icon is-medium mr-2 has-text-light">
+                        <i class="fab fa-x-twitter fa-lg"></i>
+                    </a>
+                    <a href="https://www.producthunt.com/posts/microsaaslink" class="icon is-medium has-text-light">
+                        <i class="fab fa-product-hunt fa-lg"></i>
+                    </a>
+                </div>
+                <p class="has-text-grey-light">
+                    <span class="icon is-small mr-1">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                    <a href="mailto:hello@microsaaslink.com" class="has-text-light">info@microsaasl.ink</a>
+                </p>
             </div>
         </div>
-    </footer>
+        
+        <hr class="footer-divider">
+        
+        <!-- Bottom Footer -->
+        <div class="columns is-vcentered mt-5">
+            <div class="column">
+                <p class="has-text-grey-light">&copy; <span id="year">2025</span> Microsaaslink. All rights reserved.</p>
+            </div>
+            <div class="column has-text-right">
+                <p class="has-text-grey-light is-size-7">
+                    <span class="payment-icons mr-2">
+                        <i class="fab fa-cc-visa fa-lg mr-1"></i>
+                        <i class="fab fa-cc-mastercard fa-lg mr-1"></i>
+                        <i class="fab fa-cc-paypal fa-lg"></i>
+                    </span>
+                    Secure payments by Paddle
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+</footer>
+
+<style>
+    .has-text-turquoise {
+        color: #00d1b2 !important;
+    }
+    .is-turquoise {
+        background-color: #00d1b2;
+        border-color: transparent;
+        color: #fff;
+    }
+    .footer {
+        background-color: #191919;
+    }
+    .footer-heading {
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .footer-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: block !important;
+    }
+    .footer-links li {
+        margin-bottom: 0.75rem;
+    }
+    .footer-links a {
+        transition: color 0.2s ease;
+    }
+    .footer-links a:hover {
+        color: #00d1b2 !important;
+    }
+    .social-icons a {
+        transition: all 0.3s ease;
+    }
+    .social-icons a:hover {
+        color: #00d1b2 !important;
+        transform: translateY(-3px);
+    }
+    .footer-divider {
+        background-color: rgba(255, 255, 255, 0.1);
+        height: 1px;
+        margin: 2rem 0;
+    }
+    .footer-logo {
+        max-height: 40px;
+    }
+    .newsletter-signup .input {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+    .newsletter-signup .input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+</style>
     
 
     <!-- JavaScript -->

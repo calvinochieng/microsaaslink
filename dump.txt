@@ -1,57 +1,444 @@
 <h1 class="title mb-4">
   Turn Existing SaaS Users 
-  <span class="word-rotation">
-    <span class="word visible">Frustrations</span>
-    <span class="word">Pain Points</span>
-    <span class="word">Complaints</span>
-    <span class="word">Feedback</span>
-  </span> 
+  <span id="rotating-container">
+    <span id="rotating-text">Frustrations</span>
+  </span>
   Into Profitable micro-SaaS Ideas
 </h1>
 
 <style>
-.word-rotation {
+#rotating-container {
   display: inline-block;
   position: relative;
-  min-width: 150px;
-  height: 1.2em; /* Ensure there's height for the text */
+  min-width: 120px; /* Minimum width to reduce jarring */
   text-align: center;
-  overflow: visible; /* Allow content to be visible */
+  transition: width 0.5s ease;
 }
 
-.word-rotation .word {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+#rotating-text {
+  display: inline-block;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.fade-out {
   opacity: 0;
-  display: block; /* Ensure it's a block element */
-  color: inherit; /* Inherit color from parent */
-  animation: rotate-words 8s linear infinite 0s;
+  transform: translateY(-20px);
 }
 
-/* Show first word initially */
-.word-rotation .word.visible {
+.fade-in {
   opacity: 1;
+  transform: translateY(0);
 }
 
-.word-rotation .word:nth-child(2) {
-  animation-delay: 2s;
+/* Cool text effect */
+.text-effect {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradient 4s linear infinite;
 }
 
-.word-rotation .word:nth-child(3) {
-  animation-delay: 4s;
-}
-
-.word-rotation .word:nth-child(4) {
-  animation-delay: 6s;
-}
-
-@keyframes rotate-words {
-  0% { opacity: 0; transform: translateY(10px); }
-  5% { opacity: 1; transform: translateY(0); }
-  20% { opacity: 1; transform: translateY(0); }
-  25% { opacity: 0; transform: translateY(-10px); }
-  100% { opacity: 0; transform: translateY(-10px); }
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Words to rotate through
+  const words = [
+    'Frustrations',
+    'Pain Points',
+    'Complaints',
+    'Feedback'
+  ];
+  
+  const container = document.getElementById('rotating-container');
+  const rotatingElement = document.getElementById('rotating-text');
+  let currentIndex = 0;
+  
+  // Set initial text
+  rotatingElement.textContent = words[0];
+  rotatingElement.classList.add('text-effect');
+  
+  // Set initial container width based on content
+  adjustContainerWidth();
+  
+  function adjustContainerWidth() {
+    // Create a temporary span to measure text width
+    const temp = document.createElement('span');
+    temp.style.visibility = 'hidden';
+    temp.style.position = 'absolute';
+    temp.style.whiteSpace = 'nowrap';
+    temp.textContent = rotatingElement.textContent;
+    temp.style.font = window.getComputedStyle(rotatingElement).font;
+    document.body.appendChild(temp);
+    
+    // Get the width and add some padding
+    const width = temp.offsetWidth + 20;
+    container.style.width = width + 'px';
+    
+    // Remove the temporary element
+    document.body.removeChild(temp);
+  }
+  
+  // Function to change the text with animation
+  function rotateWords() {
+    // Fade out with transform
+    rotatingElement.classList.add('fade-out');
+    
+    setTimeout(() => {
+      // Change text
+      currentIndex = (currentIndex + 1) % words.length;
+      rotatingElement.textContent = words[currentIndex];
+      
+      // Adjust container width for new text
+      adjustContainerWidth();
+      
+      // Trigger reflow for animation
+      void rotatingElement.offsetWidth;
+      
+      // Fade in with transform
+      rotatingElement.classList.remove('fade-out');
+      rotatingElement.classList.add('fade-in');
+      
+      // Reset for next animation
+      setTimeout(() => {
+        rotatingElement.classList.remove('fade-in');
+      }, 500);
+    }, 500); // Wait for fade out to complete
+  }
+  
+  // Change word every 2.5 seconds
+  setInterval(rotateWords, 2500);
+});
+</script>
+
+
+# Connect to Supabase via connection pooling with Supavisor.
+DATABASE_URL="postgresql://postgres.hdfxpccuiixjkdtepxle:[YOUR-PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
+
+# Direct connection to the database. Used for migrations.
+DIRECT_URL="postgresql://postgres.hdfxpccuiixjkdtepxle:[YOUR-PASSWORD]@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
+
+
+
+<section class="hero is-fullheight-with-navbar">
+  <!-- Improved light bulb animation -->
+  <div class="light-container">
+    <div class="wire"></div>
+    <div class="bulb-container">
+      <div class="bulb-cap"></div>
+      <div class="bulb glow"></div>
+    </div>
+  </div>
+  
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8 has-text-centered">
+          <h1 class="title mb-4">
+            Turn Existing SaaS Users 
+            <span id="rotating-container">
+              <span id="rotating-text">Frustrations</span>
+            </span>
+            Into Profitable micro-SaaS Ideas
+          </h1>  
+          <p class="subtitle has-text-white is-size-4 mb-6">
+            Discover untapped market opportunities by analyzing user feedback from existing SaaS products. 
+            Transform validated pain points into targeted micro-SaaS solutions that customers are ready to pay for.
+          </p>
+          <div class="buttons is-centered">
+            <a href="{% url 'account_signup' %}" class="button cta-button is-large">
+              <span class="icon mr-2">
+                <i class="fas fa-lightbulb"></i>
+              </span>
+              <span>Start Your Analysis</span>
+            </a>
+            <a href="#how-it-works" class="button is-light is-outlined is-rounded">
+              See How It Works
+            </a>
+          </div>
+          <div class="demo-image mt-6">
+            <img src="{% static 'demo.png' %}" alt="MicrosaaaLink Demo" class="has-shadow">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Enhanced lightbulb effect */
+  .light-container {
+    position: relative;
+    height: 150px;
+    margin-bottom: 2rem;
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    z-index: 99;
+    transform: translateX(-50%);
+  }
+  
+  .wire {
+    position: absolute;
+    width: 2px;
+    height: 70px;
+    background-color: #333;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 0;
+  }
+  
+  .bulb-container {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .bulb {
+    width: 80px;
+    height: 80px;
+    background-color: white;
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 60px 20px rgba(255, 255, 255, 0.6);
+    transition: box-shadow 0.5s ease;
+  }
+  
+  .bulb.glow {
+    animation: glow 3s infinite alternate;
+  }
+  
+  @keyframes glow {
+    0% { box-shadow: 0 0 60px 20px rgba(255, 255, 255, 0.6); }
+    100% { box-shadow: 0 0 80px 30px rgba(255, 255, 255, 0.9); }
+  }
+  
+  .bulb-cap {
+    width: 20px;
+    height: 20px;
+    background-color: #333;
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 3px;
+  }
+  
+  /* Enhanced rotating text effect */
+  #rotating-container {
+    display: inline-block;
+    position: relative;
+    min-width: 160px;
+    text-align: center;
+    transition: width 0.5s ease;
+  }
+  
+  #rotating-text {
+    display: inline-block;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    font-weight: 700;
+  }
+  
+  .text-effect {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    animation: gradient 4s linear infinite;
+  }
+  
+  /* Enhanced demo image */
+  .demo-image img {
+    border-radius: 10px;
+    max-width: 100%;
+    transition: transform 0.3s ease;
+  }
+  
+  .has-shadow {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Enhanced CTA button */
+  .cta-button {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+    color: white;
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Words to rotate through
+  const words = [
+    'Frustrations',
+    'Pain Points',
+    'Complaints',
+    'Problems',
+    'Feedback'
+  ];
+  
+  const container = document.getElementById('rotating-container');
+  const rotatingElement = document.getElementById('rotating-text');
+  let currentIndex = 0;
+  
+  // Set initial text
+  rotatingElement.textContent = words[0];
+  rotatingElement.classList.add('text-effect');
+  
+  // Set initial container width based on content
+  adjustContainerWidth();
+  
+  function adjustContainerWidth() {
+    // Create a temporary span to measure text width
+    const temp = document.createElement('span');
+    temp.style.visibility = 'hidden';
+    temp.style.position = 'absolute';
+    temp.style.whiteSpace = 'nowrap';
+    temp.textContent = rotatingElement.textContent;
+    temp.style.font = window.getComputedStyle(rotatingElement).font;
+    document.body.appendChild(temp);
+    
+    // Get the width and add some padding
+    const width = temp.offsetWidth + 40;
+    container.style.width = width + 'px';
+    
+    // Remove the temporary element
+    document.body.removeChild(temp);
+  }
+  
+  // Function to change the text with animation
+  function rotateWords() {
+    // Fade out with transform
+    rotatingElement.style.opacity = '0';
+    rotatingElement.style.transform = 'translateY(-20px)';
+    
+    setTimeout(() => {
+      // Change text
+      currentIndex = (currentIndex + 1) % words.length;
+      rotatingElement.textContent = words[currentIndex];
+      
+      // Adjust container width for new text
+      adjustContainerWidth();
+      
+      // Fade in with transform
+      rotatingElement.style.opacity = '1';
+      rotatingElement.style.transform = 'translateY(0)';
+    }, 500);
+  }
+  
+  // Change word every 3 seconds
+  setInterval(rotateWords, 3000);
+});
+</script>
+
+<style>
+  /* Update gradient variables */
+  :root {
+    --primary-gradient: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #4F46E5 100%);
+    --text-gradient: linear-gradient(45deg, #6366F1 0%, #8B5CF6 50%, #4F46E5 100%);
+  }
+
+  /* Hero section styling */
+  .hero {
+    background-image: var(--primary-gradient);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Animated gradient background for modern effect */
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background: linear-gradient(45deg, 
+      rgba(99, 102, 241, 0.1) 0%, 
+      rgba(139, 92, 246, 0.2) 50%, 
+      rgba(79, 70, 229, 0.1) 100%);
+    transform: rotate(30deg);
+    animation: gradient-move 20s linear infinite;
+    z-index: 1;
+  }
+
+  @keyframes gradient-move {
+    0% { transform: rotate(30deg) translateX(-50%); }
+    100% { transform: rotate(30deg) translateX(50%); }
+  }
+
+  /* Header text gradient */
+  .hero .title {
+    background: var(--text-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+    padding: 0 10px;
+  }
+
+  /* Rotating text gradient */
+  .text-effect {
+    background: var(--text-gradient);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: gradient-text 8s ease infinite;
+  }
+
+  @keyframes gradient-text {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Ensure content stays above animated background */
+  .hero-body {
+    position: relative;
+    z-index: 2;
+  }
+</style>
+
+<section class="hero is-fullheight-with-navbar" style="padding-top: 4rem;">
+  <!-- Light bulb animation remains unchanged -->
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8 has-text-centered">
+          <h1 class="title mb-4 is-size-2">
+            Turn Existing SaaS Users 
+            <span id="rotating-container">
+              <span id="rotating-text" class="text-effect">Frustrations</span>
+            </span>
+            Into Profitable micro-SaaS Ideas
+          </h1>  
+          <!-- Rest of the hero content remains unchanged -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+

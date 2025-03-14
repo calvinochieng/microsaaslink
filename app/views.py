@@ -11,13 +11,32 @@ from datetime import timedelta
 from django.utils import timezone
 from django.contrib import messages
 
+from django.core.mail import send_mail
+
 
 # Import the MultiStepSaaSAnalyzer
 from services.utils import MultiStepSaaSAnalyzer
 from .models import *
+from django.core.paginator import Paginator
 
 def index(request):
-    return render(request, 'index.html')
+    projects = Project.objects.filter(status = True).order_by('-updated_at')[:6]
+    context = {
+        'projects': projects
+    }
+    return render(request, 'index.html', context)
+def saas_list(request):
+    projects = Project.objects.filter(status = True).order_by('-updated_at')
+    context = {
+        'projects': projects
+    }
+    # Add pagination for projects
+    paginator = Paginator(projects, 10)  # Show 10 projects per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context['projects'] = page_obj
+    return render(request, 'saas_list.html', context)
 def pricing(request):
     return render(request, 'pricing.html')
 
@@ -116,6 +135,8 @@ def dashboard(request):
 @login_required
 def analyze_saas(request):
     user_input = request.GET.get('input', '').strip()  # Get input and strip spaces
+    name = request.GET.get('name', '').strip()  # Get name from query parameters
+    url = request.GET.get('url', '').strip()  # Get URL from query parameters
 
     if not user_input:
         messages.error(request, "No input provided. Please enter a name or a website link.")
@@ -322,3 +343,44 @@ def micro_saas_ideas(request):
     }
     
     return render(request, 'micro_saas_ideas.html', context)
+
+
+def about(request):
+    return render(request, 'about.html')
+
+def blog(request):
+    # If you have a Blog model:
+    # posts = BlogPost.objects.filter(published=True).order_by('-created_at')
+    return render(request, 'blog.html', {
+        # 'posts': posts
+    })
+
+# Legal Pages
+def terms_of_service(request):
+    return render(request, 'legal/terms.html')
+
+def privacy_policy(request):
+    return render(request, 'legal/privacy.html')
+
+def refund_policy(request):
+    return render(request, 'legal/refund.html')
+
+# Support Views
+def contact(request):
+    if request.method == 'POST':
+        # Process contact form
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        
+        send_mail(
+            f"Contact Form Submission from {name}",
+            message,
+            email,
+            [settings.DEFAULT_FROM_EMAIL],
+            fail_silently=False,
+        )
+        messages.success(request, "Your message has been sent!")
+        return redirect('contact')
+    
+    return render(request, 'support/contact.html')

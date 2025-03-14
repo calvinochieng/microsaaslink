@@ -21,15 +21,45 @@
 
 {% block custom_styles %}
 <style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+    --text-gradient: linear-gradient(45deg, #63f1b8 0%, #5cacf6 50%, #4F46E5 100%);
+  }
+  
+  .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .testimonial-card {
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      height: 100%;
+    }
+    .feature-card ul {
+      list-style: none !important;
+      margin-left: 0 !important;
+    }
+
+    .feature-card ul li {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .feature-card ul li .icon {
+      margin-right: 0.5rem;
+    }
+
   /* Enhanced lightbulb effect */
   .light-container {
     position: relative;
     height: 150px;
     margin-bottom: 2rem;
     position: absolute;
-    top: -17px;
+    top: -60px;
     left: 50%;
-    z-index: 99;
+    z-index: 0;
     transform: translateX(-50%);
   }
   
@@ -81,29 +111,7 @@
     border-radius: 3px;
   }
   
-  /* Enhanced rotating text effect */
-  #rotating-container {
-    display: inline-block;
-    position: relative;
-    min-width: 160px;
-    text-align: center;
-    transition: width 0.5s ease;
-  }
-  
-  #rotating-text {
-    display: inline-block;
-    transition: transform 0.5s ease, opacity 0.5s ease;
-    font-weight: 700;
-  }
-  
-  .text-effect {
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-    background-size: 200% auto;
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    animation: gradient 4s linear infinite;
-  }
+
   
   /* Enhanced demo image */
   .demo-image img {
@@ -139,76 +147,108 @@
     box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
     color: white;
   }
-</style>
   
+  .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+      text-align: center;
+      background: var(--text-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+</style>
 <style>
-  #rotating-container {
-  display: inline-block;
-  position: relative;
-  min-width: 120px; /* Minimum width to reduce jarring */
-  text-align: center;
-  transition: width 0.5s ease;
+
+  /* Animated gradient background for modern effect */
+  .hero {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background: linear-gradient(45deg, 
+      rgba(99, 102, 241, 0.1) 0%, 
+      rgba(139, 92, 246, 0.2) 50%, 
+      rgba(79, 70, 229, 0.1) 100%);
+    transform: rotate(30deg);
+    animation: gradient-move 20s linear infinite;
+    z-index: 1;
   }
 
-  #rotating-text {
-  display: inline-block;
-  transition: transform 0.5s ease, opacity 0.5s ease;
+  @keyframes gradient-move {
+    0% { transform: rotate(30deg) translateX(-50%); }
+    100% { transform: rotate(30deg) translateX(50%); }
   }
 
-  .fade-out {
-  opacity: 0;
-  transform: translateY(-20px);
+  /* Header text gradient */
+  .hero .title {
+    background: var(--text-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    z-index: 2;
+    display: inline-block;
+    text-decoration: underline;
+    padding: 0 10px;
   }
-
-  .fade-in {
-  opacity: 1;
-  transform: translateY(0);
-  }
-
-  /* Cool text effect */
+  
+  /* Rotating text gradient */
   .text-effect {
-  background: linear-gradient(45deg, #830606, #4ecdc4);
-  background-size: 200% auto;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: gradient 4s linear infinite;
+    background: var(--text-gradient);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    
+    text-decoration: underline;
+    animation: gradient-text 8s ease infinite;
   }
 
-  @keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  @keyframes gradient-text {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Ensure content stays above animated background */
+  .hero-body {
+    position: relative;
+    z-index: 2;
   }
 </style>
 
 {% endblock custom_styles %}
 
-{% block content %}
-<section class="hero is-fullheight-with-navbar" style="padding-top: 4rem;">
-  <!-- Improved light bulb animation -->
-  <div class="light-container">
-    <div class="wire"></div>
-    <div class="bulb-container">
-      <div class="bulb-cap"></div>
-      <div class="bulb glow"></div>
-    </div>
+{% block content %} <!-- Improved light bulb animation -->
+<div class="light-container">
+  <div class="wire"></div>
+  <div class="bulb-container">
+    <div class="bulb-cap"></div>
+    <div class="bulb glow"></div>
   </div>
+</div>
   
+<section class="hero is-fullheight-with-navbar" style="padding-top: 4rem;">
+ 
   <div class="hero-body">
     <div class="container">
       <div class="columns is-centered">
         <div class="column is-8 has-text-centered">
-          <h1 class="title mb-4">
+          <h1 class="title mb-4 is-size-2">
             Turn Existing SaaS Users 
-            <span id="rotating-container">
+            <span id="rotating-container" style="border-bottom: 7px solid white ;">
               <span id="rotating-text">Frustrations</span>
             </span>
             Into Profitable micro-SaaS Ideas
           </h1>  
-          <p class="subtitle has-text-white is-size-4 mb-6">
+          <p class="subtitle has-text-white is-size-4 mb-6 is-hidden-mobile	">
             Discover untapped market opportunities by analyzing user feedback from existing SaaS products. 
-            Transform validated pain points into targeted micro-SaaS solutions that customers are ready to pay for.
+            Transform these validated pain points into targeted micro-SaaS solutions that customers are ready to pay for.
           </p>
           <div class="buttons is-centered">
             <a href="{% url 'account_signup' %}" class="button cta-button is-large is-primary">
@@ -216,9 +256,6 @@
                 <i class="fas fa-lightbulb"></i>
               </span>
               <span>Start Your Analysis</span>
-            </a>
-            <a href="#how-it-works" class="button is-primary is-outlined is-rounded">
-              See How It Works
             </a>
           </div>
           <div class="demo-image mt-6">
@@ -229,202 +266,616 @@
     </div>
   </div>
 </section>
-
-<!-- <div class="light-container">
-  <div class="wire"></div>
-  <div class="bulb-container">
-    <div class="bulb-cap"></div>
-    <div class="bulb"></div>
-  </div>
-</div>
-<section class="hero is-fullheight-with-navbar">
-  <div class="hero-body">
-    <div class="container">
-      <div class="columns is-centered">
-        <div class="column is-8 has-text-centered">
-          <h1 class="title mb-4">
-            Turn Existing SaaS Users 
-            <span id="rotating-container">
-              <span id="rotating-text">Frustrations</span>
-            </span>
-            Into Profitable micro-SaaS Ideas
-          </h1>  
-          <p class="subtitle has-text-white is-size-4 mb-6">
-            MicrosaaaLink analyzes user feedback from existing SaaS products to uncover market gaps. We transform these pain points into targeted micro-SaaS ideas that solve real problems, helping entrepreneurs identify viable opportunities and launch faster          </p>
-          <div class="buttons is-centered">
-            <a href="{% url 'account_signup' %}" class="button is-primary is-rounded is-large">
-              Start Your Analysis
-            </a>
-            <a href="#how-it-works" class="button is-primary is-outlined is-rounded">
-              See How It Works
-            </a>
-          </div>
-          <div class="demo-image">
-            <img src="{% static 'demo.png' %}" alt="">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section> -->
-<!-- Analyzed SaaS Section -->
-<section class="section" id="analyzed-saas">
+<!-- Featured SaaS -->
+<section class="section has-background-black py-6" id="analyzed-saas">
   <div class="container">
-    <h2 class="section-title">Existing SaaS To Analyze </h2>
-    <p class="has-text-centered is-size-5 mb-6">Discover opportunities in these popular SaaS platforms</p>
+    <h2 class="section-title has-text-centered has-text-turquoise mb-4">Popular SaaS Platforms to Analyze</h2>
+    <p class="has-text-centered is-size-5 mb-6 has-text-light">Discover untapped opportunities in these high-demand SaaS ecosystems</p>
     
     <div class="columns is-multiline">
-      <div class="columns is-multiline">
-        {% for product in saas_data %}
-          <div class="column is-4">
-            <div class="feature-card">
-              <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
-                <div class="is-flex is-align-items-center">
-                  <h3 class="title is-4 mb-0">{{ product.name }}</h3>
+      {% for product in projects %}
+        <div class="column is-4 mb-5">
+          <div class="saas-card box has-background-dark has-text-light has-border-turquoise">
+            <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+              <div class="is-flex is-align-items-center">
+                {% if product.logo %}
+                  <figure class="image is-48x48 mr-3">
+                    <img src="{{ product.logo }}" alt="{{ product.name }} logo">
+                  </figure>
+                {% else %}
+                  <span class="icon is-large mr-3">
+                    <i class="fas fa-cube fa-2x has-text-turquoise"></i>
+                  </span>
+                {% endif %}
+                <div>
+                  <h3 class="title is-4 has-text-light mb-1">{{ product.name }}</h3>
+                  <p class="subtitle is-6 has-text-grey-light">
+                    <a href="{{product.url}}" class="has-text-turquoise">{{product.url|truncatechars:30}}</a>
+                  </p>
                 </div>
-                <span class="tag is-primary is-light">{{ product.category }}</span>
               </div>
-              <p class="mb-4">{{ product.description }}</p>              
-              <a href="{% url 'dashboard'%}" class="button is-primary is-outlined is-fullwidth is-rounded">
-                Analyze
-              </a>
+              <span class="tag is-info is-light">{{ product.category|default:"SaaS" }}</span>
             </div>
+            
+            <p class="mb-4 saas-description">{{ product.description|truncatechars:120 }}</p>
+            
+            <div class="opportunity-metrics is-flex is-justify-content-space-between mb-4">
+              <div class="metric has-text-centered">
+                <p class="is-size-4 has-text-turquoise">{{ product.pain_points|default:"5+" }}</p>
+                <p class="is-size-7 has-text-grey-light">Pain Points</p>
+              </div>
+              <div class="metric has-text-centered">
+                <p class="is-size-4 has-text-turquoise">{{ product.opportunities|default:"3+" }}</p>
+                <p class="is-size-7 has-text-grey-light">Opportunities</p>
+              </div>
+              <div class="metric has-text-centered">
+                <p class="is-size-4 has-text-turquoise">${{ product.potential_revenue|default:"5K+" }}</p>
+                <p class="is-size-7 has-text-grey-light">Monthly Potential</p>
+              </div>
+            </div>
+            
+            <a href="{% url 'analyze_saas' %}?name={{product.name}}&url={{product.url}}" class="button is-turquoise is-fullwidth is-rounded">
+              <span class="icon">
+                <i class="fas fa-search"></i>
+              </span>
+              <span>Analyze Opportunities</span>
+            </a>
           </div>
-        {% endfor %}
-      </div>    
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Featured Tags Section -->
+    <div class="tags-container has-text-centered mb-6">
+      <p class="has-text-light mb-3">Popular categories:</p>
+      <div class="tags is-centered">
+        <span class="tag is-medium is-rounded is-dark">Project Management</span>
+        <span class="tag is-medium is-rounded is-dark">Marketing</span>
+        <span class="tag is-medium is-rounded is-dark">CRM</span>
+        <span class="tag is-medium is-rounded is-dark">Productivity</span>
+        <span class="tag is-medium is-rounded is-dark">Design</span>
+        <span class="tag is-medium is-rounded is-dark">Development</span>
+      </div>
     </div>
 
     <!-- View More Section -->
     <div class="has-text-centered mt-6">
-      <p class="mb-4">Want to see opportunities in other SaaS platforms?</p>
-      <button class="button is-primary is-rounded">
-        <span>View All Analyzed SaaS</span>
+      <p class="has-text-light mb-4">Can't find what you're looking for? Explore our complete database:</p>
+      <a href="{%url 'saas_list'%}" class="button is-medium is-turquoise is-outlined is-rounded">
+        <span>View All SaaS Platforms</span>
         <span class="icon">
           <i class="fas fa-arrow-right"></i>
         </span>
-      </button>
+      </a>
+    </div>
+  </div>
+</section>
+<style>
+  .has-text-turquoise {
+    color: #00d1b2 !important;
+  }
+  .is-turquoise {
+    background-color: #00d1b2;
+    border-color: transparent;
+    color: #fff;
+  }
+  .is-turquoise.is-outlined {
+    background-color: transparent;
+    border-color: #00d1b2;
+    color: #00d1b2;
+  }
+  .has-border-turquoise {
+    border-top: 3px solid #00d1b2;
+  }
+  .saas-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+  }
+  .saas-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 209, 178, 0.2);
+  }
+  .saas-description {
+    min-height: 60px;
+  }
+  .opportunity-metrics {
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .tags .tag {
+    margin: 5px;
+    transition: all 0.2s ease;
+  }
+  .tags .tag:hover {
+    background-color: #00d1b2;
+    color: #fff;
+    cursor: pointer;
+  }
+</style>
+<!--End Featured SaaS-->
+<!-- How It Works -->
+<section class="section has-background-dark py-6" id="how-it-works">
+  <div class="container">
+    <h2 class="section-title has-text-centered mb-6 has-text-light">How MicroSaaSlink Works</h2>
+    
+    <div class="steps-container mb-6">
+      <div class="steps-line"></div>
+    </div>
+    
+    <div class="columns is-multiline">
+      <div class="column is-3">
+        <div class="feature-card box has-background-black has-text-light has-shadow">
+          <div class="step-number has-text-turquoise mb-4">1</div>
+          <span class="icon is-large mb-4">
+            <i class="fas fa-search fa-2x has-text-turquoise"></i>
+          </span>
+          <h3 class="title is-4 mb-4 has-text-light">Target Analysis</h3>
+          <p>Enter any SaaS product URL or name, and our AI will analyze its entire ecosystem for untapped opportunities and pain points.</p>
+          <div class="mt-4">
+            <a href="{% url 'account_signup' %}" class="button is-small is-turquoise is-outlined">Start Analysis</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="column is-3">
+        <div class="feature-card box has-background-black has-text-light has-shadow">
+          <div class="step-number has-text-turquoise mb-4">2</div>
+          <span class="icon is-large mb-4">
+            <i class="fas fa-chart-line fa-2x has-text-turquoise"></i>
+          </span>
+          <h3 class="title is-4 mb-4 has-text-light">Pain Point Identification</h3>
+          <p>We scan thousands of reviews, forums, and social discussions to identify recurring user complaints and feature requests.</p>
+          <div class="mt-4">
+            <span class="tag is-info">Real-time Data</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="column is-3">
+        <div class="feature-card box has-background-black has-text-light has-shadow">
+          <div class="step-number has-text-turquoise mb-4">3</div>
+          <span class="icon is-large mb-4">
+            <i class="fas fa-lightbulb fa-2x has-text-turquoise"></i>
+          </span>
+          <h3 class="title is-4 mb-4 has-text-light">Opportunity Generation</h3>
+          <p>Receive specific micro-SaaS ideas with market validation, audience size, and potential revenue estimates.</p>
+          <div class="mt-4">
+            <span class="tag is-success">Validated Ideas</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="column is-3">
+        <div class="feature-card box has-background-black has-text-light has-shadow">
+          <div class="step-number has-text-turquoise mb-4">4</div>
+          <span class="icon is-large mb-4">
+            <i class="fas fa-rocket fa-2x has-text-turquoise"></i>
+          </span>
+          <h3 class="title is-4 mb-4 has-text-light">Launch Blueprint</h3>
+          <p>Get a complete roadmap with technical specifications, pricing strategy, and marketing plan to start building immediately.</p>
+          <div class="mt-4">
+            <span class="tag is-warning">Ready to Build</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="has-text-centered mt-6">
+      <a href="#start-analysis" class="button is-medium is-turquoise is-rounded">
+        <span class="icon">
+          <i class="fas fa-play"></i>
+        </span>
+        <span>Start Your Analysis</span>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- How It Works -->
-<section class="section has-background-black" id="how-it-works">
-  <div class="container">
-    <h2 class="section-title">How It Works</h2>
-    <div class="columns is-multiline">
-      <div class="column is-3">
-        <div class="feature-card box">
-          <span class="icon is-large mb-4">
-            <i class="fas fa-search fa-2x" style="color: #4F46E5;"></i>
-          </span>
-          <h3 class="title is-4 mb-4">Target Analysis</h3>
-          <p>Input your target SaaS and let our AI analyze its ecosystem for opportunities.</p>
-        </div>
-      </div>
-      <div class="column is-3">
-        <div class="feature-card box">
-          <span class="icon is-large mb-4">
-            <i class="fas fa-chart-line fa-2x" style="color: #4F46E5;"></i>
-          </span>
-          <h3 class="title is-4 mb-4">Market Research</h3>
-          <p>We aggregate feedback from multiple sources to identify validated pain points.</p>
-        </div>
-      </div>
-      <div class="column is-3">
-        <div class="feature-card box">
-          <span class="icon is-large mb-4">
-            <i class="fas fa-lightbulb fa-2x" style="color: #4F46E5;"></i>
-          </span>
-          <h3 class="title is-4 mb-4">Opportunity Discovery</h3>
-          <p>Get specific micro-SaaS ideas with market validation and revenue potential.</p>
-        </div>
-      </div>
-      <div class="column is-3">
-        <div class="feature-card box">
-          <span class="icon is-large mb-4">
-            <i class="fas fa-rocket fa-2x" style="color: #4F46E5;"></i>
-          </span>
-          <h3 class="title is-4 mb-4">Launch Blueprint</h3>
-          <p>Receive a detailed roadmap including tech stack, pricing, and go-to-market strategy.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<style>
+  .has-text-turquoise {
+    color: #00d1b2 !important;
+  }
+  .is-turquoise {
+    background-color: #00d1b2;
+    border-color: transparent;
+    color: #fff;
+  }
+  .is-turquoise.is-outlined {
+    background-color: transparent;
+    border-color: #00d1b2;
+    color: #00d1b2;
+  }
+  .has-shadow {
+    box-shadow: 0 4px 10px rgba(0, 209, 178, 0.1);
+    transition: all 0.3s ease;
+  }
+  .has-shadow:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 209, 178, 0.2);
+  }
+  .step-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    border: 2px solid #00d1b2;
+  }
+  .steps-container {
+    position: relative;
+    height: 4px;
+  }
+  .steps-line {
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 4px;
+    background-color: #00d1b2;
+  }
+</style>
 
 <!-- Features Section -->
-<section class="section" id="features">
+<section class="section has-background-black py-6" id="features">
   <div class="container">
-    <h2 class="section-title">Why Choose Us</h2>
+    <h2 class="section-title has-text-centered mb-6 has-text-turquoise">Why MicroSaaSlink Works</h2>
     <div class="columns is-multiline">
-      <div class="column is-6">
-        <div class="feature-card">
-          <h3 class="title is-4 mb-4">Data-Driven Insights</h3>
-          <p>Our AI analyzes thousands of user reviews, discussions, and feedback across multiple platforms to identify real market opportunities.</p>
+      <div class="column is-6 mb-5">
+        <div class="feature-card p-5 has-background-dark has-text-light">
+          <div class="icon-wrapper mb-4">
+            <i class="fas fa-chart-line fa-2x has-text-turquoise"></i>
+          </div>
+          <h3 class="title is-4 mb-4 has-text-light">Data-Driven Insights</h3>
+          <p>Our AI analyzes thousands of user reviews, discussions, and feedback across multiple platforms to identify genuine pain points and market opportunities that others miss.</p>
         </div>
       </div>
-      <div class="column is-6">
-        <div class="feature-card">
-          <h3 class="title is-4 mb-4">Validated Opportunities</h3>
-          <p>Every opportunity we present comes with proof of market demand and specific use cases from real users.</p>
+      <div class="column is-6 mb-5">
+        <div class="feature-card p-5 has-background-dark has-text-light">
+          <div class="icon-wrapper mb-4">
+            <i class="fas fa-check-circle fa-2x has-text-turquoise"></i>
+          </div>
+          <h3 class="title is-4 mb-4 has-text-light">Validated Opportunities</h3>
+          <p>Every opportunity comes with proof of market demand, user sentiment analysis, and specific use cases from real users who are actively seeking solutions.</p>
         </div>
       </div>
-      <div class="column is-6">
-        <div class="feature-card">
-          <h3 class="title is-4 mb-4">Complete Roadmap</h3>
-          <p>Get more than just ideas - receive detailed technical specifications, pricing strategies, and marketing plans.</p>
+      <div class="column is-6 mb-5">
+        <div class="feature-card p-5 has-background-dark has-text-light">
+          <div class="icon-wrapper mb-4">
+            <i class="fas fa-map fa-2x has-text-turquoise"></i>
+          </div>
+          <h3 class="title is-4 mb-4 has-text-light">Complete Business Roadmap</h3>
+          <p>Get more than just ideas - receive detailed technical specifications, competitive pricing strategies, and targeted marketing plans to reach your ideal customers.</p>
         </div>
       </div>
-      <div class="column is-6">
-        <div class="feature-card">
-          <h3 class="title is-4 mb-4">Quick Implementation</h3>
-          <p>Start building immediately with our ready-to-use technical specifications and development guidelines.</p>
+      <div class="column is-6 mb-5">
+        <div class="feature-card p-5 has-background-dark has-text-light">
+          <div class="icon-wrapper mb-4">
+            <i class="fas fa-rocket fa-2x has-text-turquoise"></i>
+          </div>
+          <h3 class="title is-4 mb-4 has-text-light">Quick Implementation</h3>
+          <p>Start building immediately with our ready-to-use technical specifications and development guidelines that accelerate your path from concept to paying customers.</p>
+        </div>
+      </div>
+      <div class="column is-6 mb-5">
+        <div class="feature-card p-5 has-background-dark has-text-light">
+          <div class="icon-wrapper mb-4">
+            <i class="fas fa-lightbulb fa-2x has-text-turquoise"></i>
+          </div>
+          <h3 class="title is-4 mb-4 has-text-light">Untapped Niche Discovery</h3>
+          <p>Uncover specialized micro-SaaS opportunities that larger companies ignore but represent profitable markets with eager customers ready to pay for solutions.</p>
+        </div>
+      </div>
+      <div class="column is-6 mb-5">
+        <div class="feature-card p-5 has-background-dark has-text-light">
+          <div class="icon-wrapper mb-4">
+            <i class="fas fa-dollar-sign fa-2x has-text-turquoise"></i>
+          </div>
+          <h3 class="title is-4 mb-4 has-text-light">Revenue Potential Analysis</h3>
+          <p>Each opportunity includes projected revenue models, potential customer base estimates, and subscription pricing strategies to maximize your micro-SaaS profitability.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 <!-- Testimonials -->
-<section class="section" id="testimonials">
+<section class="section has-background-dark py-6" id="testimonials">
   <div class="container">
-    <h2 class="section-title">What Founders Say</h2>
-    <div class="columns is-centered">
+    <h2 class="section-title has-text-centered has-text-light mb-6">Success Stories</h2>
+    
+    <div class="columns is-multiline">
       <div class="column is-4">
-        <div class="testimonial-card">
-          <div class="is-flex is-align-items-center mb-4">
+        <div class="testimonial-card has-background-black has-text-light p-5 h-100">
+          <div class="quote-icon mb-4">
+            <i class="fas fa-quote-left fa-2x has-text-turquoise"></i>
+          </div>
+          <p class="testimonial-text mb-5">
+            "Found an amazing opportunity in Notion's ecosystem that MicroSaaSlink identified. Launched my plugin in just 3 weeks and already have paying customers. The pain point analysis was spot-on!"
+          </p>
+          <div class="testimonial-footer is-flex is-align-items-center">
+            <!-- <figure class="image is-48x48 mr-3 is-outlined">
+              <img src="/api/placeholder/48/48" alt="Jamie Chen" class="is-rounded">
+            </figure> -->
             <div>
-              <p class="title is-5 mb-1">Jamie Chen</p>
-              <p class="subtitle is-6">Indie Hacker</p>
+              <p class="title is-5 mb-1 has-text-light">Jamie Chen</p>
+              <p class="subtitle is-6 has-text-turquoise">Indie Hacker</p>
+              <div class="stars">
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+              </div>
             </div>
           </div>
-          <p>"Found an amazing opportunity in Notion's ecosystem. Launched my plugin in 3 weeks and already have paying customers."</p>
         </div>
       </div>
+      
       <div class="column is-4">
-        <div class="testimonial-card">
-          <div class="is-flex is-align-items-center mb-4">
+        <div class="testimonial-card has-background-black has-text-light p-5 h-100">
+          <div class="quote-icon mb-4">
+            <i class="fas fa-quote-left fa-2x has-text-turquoise"></i>
+          </div>
+          <p class="testimonial-text mb-5">
+            "The market research alone saved us months of work. We validated our idea before writing a single line of code. Within 60 days of launch, we hit $5K MRR targeting Shopify store owners."
+          </p>
+          <div class="testimonial-footer is-flex is-align-items-center">
+            <!-- <figure class="image is-48x48 mr-3">
+              <img src="/api/placeholder/48/48" alt="Sarah Miller" class="is-rounded">
+            </figure> -->
             <div>
-              <p class="title is-5 mb-1">Sarah Miller</p>
-              <p class="subtitle is-6">SaaS Founder</p>
+              <p class="title is-5 mb-1 has-text-light">Sarah Miller</p>
+              <p class="subtitle is-6 has-text-turquoise">SaaS Founder</p>
+              <div class="stars">
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+              </div>
             </div>
           </div>
-          <p>"The market research alone saved us months of work. We validated our idea before writing a single line of code."</p>
+        </div>
+      </div>
+      
+      <div class="column is-4">
+        <div class="testimonial-card has-background-black has-text-light p-5 h-100">
+          <div class="quote-icon mb-4">
+            <i class="fas fa-quote-left fa-2x has-text-turquoise"></i>
+          </div>
+          <p class="testimonial-text mb-5">
+            "After struggling to find a profitable SaaS idea for months, MicroSaaSlink helped me identify a critical pain point in Asana's workflow. My solution now generates $3.2K MRR with minimal marketing."
+          </p>
+          <div class="testimonial-footer is-flex is-align-items-center">
+            <!-- <figure class="image is-48x48 mr-3">
+              <img src="/api/placeholder/48/48" alt="Michael Rodriguez" class="is-rounded">
+            </figure> -->
+            <div>
+              <p class="title is-5 mb-1 has-text-light">Michael Rodriguez</p>
+              <p class="subtitle is-6 has-text-turquoise">Developer & Entrepreneur</p>
+              <div class="stars">
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star has-text-warning"></i>
+                <i class="fas fa-star-half-alt has-text-warning"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="metrics-container mt-6 pt-6 has-text-centered">
+      <div class="columns is-multiline">
+        <div class="column is-3">
+          <div class="metric-card">
+            <p class="title is-2 has-text-turquoise">140+</p>
+            <p class="subtitle is-5 has-text-light">Success Stories</p>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="metric-card">
+            <p class="title is-2 has-text-turquoise">1.5 k+</p>
+            <p class="subtitle is-5 has-text-light">micro-SaaS Generated</p>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="metric-card">
+            <p class="title is-2 has-text-turquoise">450+</p>
+            <p class="subtitle is-5 has-text-light">SaaS Platforms Analyzed</p>
+          </div>
+        </div>
+        <div class="column is-3">
+          <div class="metric-card">
+            <p class="title is-2 has-text-turquoise">89%</p>
+            <p class="subtitle is-5 has-text-light">Success Rate</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<style>
+  .has-text-turquoise {
+    color: #00d1b2 !important;
+  }
+  .is-turquoise {
+    background-color: #00d1b2;
+    border-color: transparent;
+    color: #fff;
+  }
+  .testimonial-card {
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    transition: all 0.3s ease;
+  }
+  .testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 209, 178, 0.2);
+  }
+  .testimonial-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-style: italic;
+  }
+  .quote-icon {
+    opacity: 0.8;
+  }
+  .metrics-container {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .metric-card {
+    padding: 1.5rem;
+  }
+</style>
+
+<!-- CTA Section -->
+<section class="section has-background-black py-6" id="get-started">
+  <div class="container">
+    <!-- Background Design Elements -->
+    <div class="cta-background">
+      <div class="glow-circle"></div>
+      <div class="dots-pattern"></div>
+    </div>
+    
+    <div class="columns is-centered">
+      <div class="column is-10 has-text-centered">
+        <h2 class="title has-text-turquoise is-2 mb-4">Ready to Discover Your Profitable Micro-SaaS Opportunity?</h2>
+        <p class="subtitle has-text-light is-4 mb-5">Join successful founders who are building $5K+ MRR products by targeting validated pain points.</p>
+        
+        <!-- Featured Benefits -->
+        <div class="benefits-row columns is-mobile is-multiline mb-6">
+          <div class="column is-4 benefit-item">
+            <span class="icon-text">
+              <span class="icon has-text-turquoise">
+                <i class="fas fa-check-circle"></i>
+              </span>
+              <span class="has-text-light">No Coding Required</span>
+            </span>
+          </div>
+          <div class="column is-4 benefit-item">
+            <span class="icon-text">
+              <span class="icon has-text-turquoise">
+                <i class="fas fa-check-circle"></i>
+              </span>
+              <span class="has-text-light">Validated Market Demand</span>
+            </span>
+          </div>
+          <div class="column is-4 benefit-item">
+            <span class="icon-text">
+              <span class="icon has-text-turquoise">
+                <i class="fas fa-check-circle"></i>
+              </span>
+              <span class="has-text-light">Actionable Blueprint</span>
+            </span>
+          </div>
+        </div>
+        
+        <!-- Primary CTA Button -->
+        <div class="cta-buttons">
+          <a href="{% url 'account_signup' %}" class="button is-turquoise is-large is-rounded pulse-animation">
+            <span class="icon">
+              <i class="fas fa-lightbulb"></i>
+            </span>
+            <span>Start Free Analysis</span>
+          </a>
+          
+          <p class="mt-4 has-text-grey-light">
+            <span class="icon is-small">
+              <i class="fas fa-shield-alt"></i>
+            </span>
+            No credit card required • 2-minute setup
+          </p>
+        </div>
+        
+        <!-- Testimonial Quote -->
+        <div class="mini-testimonial mt-6">
+          <p class="is-italic has-text-grey-light">"Found a $3,500 MRR opportunity in just one analysis session."</p>
+          <p class="has-text-turquoise">— Alex K., MicroSaaSlink User</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CTA Section -->
-<section class="section has-background-primary-dark" id="get-started">
-  <div class="container has-text-centered">
-    <h2 class="title has-text-white is-2 mb-6">Ready to Find Your Next Opportunity?</h2>
-    <p class="subtitle has-text-white is-4 mb-6">Join successful founders who built profitable micro-SaaS products using our insights.</p>
-    <a href="{% url 'account_signup' %}" class="button is-white is-large is-rounded">
-      Start Analysis
-    </a>
-  </div>
-</section>
+<style>
+  .has-text-turquoise {
+    color: #00d1b2 !important;
+  }
+  .is-turquoise {
+    background-color: #00d1b2;
+    border-color: transparent;
+    color: #fff;
+  }
+  .cta-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .glow-circle {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -50px;
+    background: radial-gradient(circle, rgba(0, 209, 178, 0.3) 0%, rgba(0, 209, 178, 0) 70%);
+    border-radius: 50%;
+  }
+  .dots-pattern {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.2;
+  }
+  .cta-buttons {
+    position: relative;
+    z-index: 10;
+  }
+  .benefits-row {
+    justify-content: center;
+  }
+  .benefit-item {
+    margin-bottom: 1rem;
+  }
+  .mini-testimonial {
+    max-width: 500px;
+    margin: 0 auto;
+    opacity: 0.8;
+  }
+  /* Pulse animation for CTA button */
+  .pulse-animation {
+    animation: pulse 2s infinite;
+    box-shadow: 0 0 0 rgba(0, 209, 178, 0.4);
+  }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(0, 209, 178, 0.4);
+    }
+    70% {
+      box-shadow: 0 0 0 15px rgba(0, 209, 178, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(0, 209, 178, 0);
+    }
+  }
+</style>
 {% endblock content %}
 
 {% block scripts %}

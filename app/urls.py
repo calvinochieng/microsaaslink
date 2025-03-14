@@ -3,7 +3,13 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('', index, name='index'),    
+    path('', index, name='index'),
+    path('about/', about, name='about'),
+    path('contact/', contact, name='contact'),
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path("refund-policy/", refund_policy, name="refund_policy"),
+    path('terms-of-services/', terms_of_service, name='terms_of_service'),
+    path('saas-list/', saas_list, name='saas_list'),   
     path('pricing', pricing, name="pricing") ,
     path('dashboard/', dashboard, name = "dashboard"),
     path('analyze/', analyze_saas, name='analyze_saas'), #New project here

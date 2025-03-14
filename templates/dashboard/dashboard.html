@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title> {% block title %}{% endblock %}MicroSaaSLink - Dashboard</title>
+  {% load static %}  
+  <link rel="icon" href="{% static 'icon.ico' %}" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/1.0.2/css/bulma.min.css">
@@ -142,7 +144,7 @@
     <!-- Quick Analysis Start -->
     <div class="columns">
       <div class="column is-12">
-        <form action="{% url "analyze_saas" %}" class="card" method="GET">{% csrf_token %}
+        <form action="{% url "analyze_saas" %}" class="card" method="GET">
           {% csrf_token %}
           <div class="card-content">
             <h3 class="title is-5">Quick Analysis/Project</h3>

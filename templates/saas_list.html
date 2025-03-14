@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section" id="analyzed-saas">
+    <div class="container">
+      <h2 class="section-title">Existing SaaS To Analyze </h2>
+      <p class="has-text-centered is-size-5 mb-6">Discover opportunities in these popular SaaS platforms</p>
+      <div class="columns is-multiline">
+        {% for product in projects %}
+          <div class="column is-4">
+            <div class="feature-card box">
+              <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+                <div class="is-flex is-justify-content-flex-start is-flex-direction-column">
+                  <h3 class="title is-4 mb-4">{{ product.name }}</h3>
+                  <p class="subtitle"><a href="{{product.url}}">{{product.url}}</a></p>
+                </div>
+              </div>
+              <p class="mb-4">{{ product.description|truncatechars:150 }}</p>              
+              <a href="{% url 'analyze_saas' %}?name={{product.name}}&url={{product.url}}" class="button is-primary is-outlined is-fullwidth is-rounded">
+                Analyze
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination Section -->
+      <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+          {% if projects.has_previous %}
+              <a href="?page={{ projects.previous_page_number }}" class="pagination-previous">Previous</a>
+          {% else %}
+              <a class="pagination-previous" disabled>Previous</a>
+          {% endif %}
+          
+          {% if projects.has_next %}
+              <a href="?page={{ projects.next_page_number }}" class="pagination-next">Next page</a>
+          {% else %}
+              <a class="pagination-next" disabled>Next page</a>
+          {% endif %}
+
+          <ul class="pagination-list">
+              <li><span class="pagination-ellipsis">Page {{ projects.number }} of {{ projects.paginator.num_pages }}</span></li>
+          </ul>
+      </nav>
+    </div>
+</section>
+{% endblock content %}
