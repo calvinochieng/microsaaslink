@@ -7,8 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 
-DEBUG = True or config('DEBUG',  cast=bool)
-LOCAL = True
+DEBUG =  config('DEBUG',  cast=bool)
+LOCAL = False
 
 PRODUCTION_MODE = config('PRODUCTION_MODE',cast=bool)
 
