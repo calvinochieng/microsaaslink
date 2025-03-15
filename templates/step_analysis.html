@@ -21,6 +21,7 @@
     list-style: none;
     padding: 0;
     margin-bottom: 1.5rem;
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
   }
   .steps li {
     flex: 1;
@@ -28,6 +29,8 @@
     padding: 0.5rem;
     border-bottom: 2px solid #ddd;
     cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
   }
   .steps li.step-primary {
     border-color: #00d1b2; /* primary color */
@@ -40,6 +43,91 @@
   .steps li a {
     text-decoration: none;
     color: inherit;
+    display: block; /* Improve clickable area */
+  }
+  .steps li:hover:not(.locked) {
+    background-color: rgba(0, 209, 178, 0.1);
+  }
+  .steps li.step-primary:after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #00d1b2;
+    animation: pulse 2s infinite;
+  }
+  
+  /* Progress indicators */
+  .step-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .step-progress-bar {
+    height: 6px;
+    background-color: #eee;
+    border-radius: 3px;
+    flex-grow: 1;
+    margin: 0 0.5rem;
+    overflow: hidden;
+  }
+  .step-progress-indicator {
+    height: 100%;
+    background-color: #00d1b2;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  
+  /* Card styling */
+  .card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    border-radius: 8px;
+  }
+  .card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Form styling */
+  .input:focus, .select select:focus {
+    border-color: #00d1b2;
+    box-shadow: 0 0 0 0.125em rgba(0, 209, 178, 0.25);
+  }
+  
+  /* Result container styling */
+  .result-container {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+    border-left: 4px solid #00d1b2;
+  }
+  
+  /* Button hover effects */
+  .button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .button:hover:not([disabled]) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Animations */
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  /* Responsive adjustments */
+  @media screen and (max-width: 768px) {
+    .steps li {
+      font-size: 0.85rem;
+      padding: 0.4rem 0.2rem;
+    }
   }
 </style>
 {% endblock custom_styles %}
@@ -50,6 +138,16 @@
     <div class="card">
       <div class="card-content">
         <h2 class="title has-text-primary">{{ name }} Analysis</h2>
+        <p class="subtitle is-6">Discover opportunities and generate micro-SaaS ideas</p>
+        
+        <!-- Progress indicator -->
+        <div class="step-progress">
+          <span class="tag is-primary">Step <span id="currentStepNumber">1</span>/5</span>
+          <div class="step-progress-bar">
+            <div class="step-progress-indicator" style="width: 20%"></div>
+          </div>
+          <span class="tag is-light">20% Complete</span>
+        </div>
         
         <!-- Stepper Tabs -->
         <div id="stepperContainer" class="mt-6">
@@ -64,20 +162,29 @@
           <!-- Step 1: Analyze Target SaaS -->
           <div class="step-content" id="step1Content">
             <h3 class="subtitle is-4">Step 1: Analyze Target SaaS</h3>
+            <p class="mb-4">Provide details about the SaaS platform you want to analyze for opportunities.</p>
             <!-- Action (form) container -->
             <div id="step1FormContainer">
               <form id="targetSaasForm">
                 <div class="field">
                   <label class="label">SaaS Product Name</label>
-                  <div class="control">
-                    <input type="text" id="targetSaasName" class="input" required value="{{name}}">
+                  <div class="control has-icons-left">
+                    <input type="text" id="targetSaasName" class="input" required value="{{name}}" placeholder="e.g., Slack, Trello, etc.">
+                    <span class="icon is-small is-left">
+                      <i class="fas fa-cube"></i>
+                    </span>
                   </div>
+                  <p class="help">Enter the name of the SaaS product you want to analyze</p>
                 </div>
                 <div class="field">
                   <label class="label">SaaS Product URL (optional)</label>
-                  <div class="control">
-                    <input type="url" id="targetSaasUrl" class="input" value="{{url}}">
+                  <div class="control has-icons-left">
+                    <input type="url" id="targetSaasUrl" class="input" value="{{url}}" placeholder="https://example.com">
+                    <span class="icon is-small is-left">
+                      <i class="fas fa-link"></i>
+                    </span>
                   </div>
+                  <p class="help">URL helps us gather more accurate information</p>
                 </div>
                 <div class="field">
                   <div class="control">
@@ -90,12 +197,13 @@
               </form>
             </div>
             <!-- Result container -->
-            <div id="targetSaasResult" class="is-hidden"></div>
+            <div id="targetSaasResult" class="is-hidden result-container"></div>
           </div>
           
           <!-- Step 2: Identify Competitors -->
           <div class="step-content is-hidden" id="step2Content">
             <h3 class="subtitle is-4">Step 2: Identify Competitors</h3>
+            <p class="mb-4">Discover key competitors in the market and their features.</p>
             <!-- Action container -->
             <div id="step2ActionContainer">
               <button id="identifyCompetitorsBtn" class="button is-primary is-fullwidth">
@@ -110,6 +218,7 @@
           <!-- Step 3: Analyze Pain Points -->
           <div class="step-content is-hidden" id="step3Content">
             <h3 class="subtitle is-4">Step 3: Analyze Competitor Pain Points</h3>
+            <p class="mb-4">Identify pain points and limitations in existing solutions.</p>
             <!-- Action container -->
             <div id="step3ActionContainer">
               <button id="analyzePainPointsBtn" class="button is-primary is-fullwidth">
@@ -124,6 +233,7 @@
           <!-- Step 4: Identify Market Gaps -->
           <div class="step-content is-hidden" id="step4Content">
             <h3 class="subtitle is-4">Step 4: Identify Market Gaps</h3>
+            <p class="mb-4">Discover opportunities and underserved needs in the market.</p>
             <!-- Action container -->
             <div id="step4ActionContainer">
               <button id="identifyGapsBtn" class="button is-primary is-fullwidth">
@@ -133,17 +243,21 @@
             </div>
             <!-- Result container -->
             <div id="marketGapsResult" class="box mb-4 is-hidden"></div>
+            <!-- Navigation buttons -->
+            <div class="buttons is-centered mt-6">
+              <button class="button is-outlined step-back-btn" data-step="3">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Previous Step</span>
+              </button>
+            </div>
           </div>
           
           <!-- Step 5: Generate Micro-SaaS Ideas -->
           <div class="step-content is-hidden" id="step5Content">
             <h3 class="subtitle is-4">Step 5: Generate Micro-SaaS Ideas</h3>
+            <p class="mb-4">Create innovative micro-SaaS concepts based on your analysis.</p>
             <!-- Action container -->
             <div id="step5ActionContainer">
-              <button id="generateIdeasBtn" class="button is-primary is-fullwidth">
-                <span class="icon"><i class="fas fa-lightbulb"></i></span>
-                <span>Generate Micro-SaaS Ideas</span>
-              </button>
               <div class="field">
                 <label class="label">Number of Ideas to Generate</label>
                 <div class="control">
@@ -156,24 +270,69 @@
                     </select>
                   </div>
                 </div>
+                <p class="help">How many unique micro-SaaS ideas would you like to generate?</p>
               </div>
+              <div class="field">
+                <label class="label">Focus Area</label>
+                <div class="control">
+                  <div class="select is-fullwidth">
+                    <select id="ideaFocus">
+                      <option value="all" selected>All Opportunities</option>
+                      <option value="integration">Integration Opportunities</option>
+                      <option value="extension">Extension Opportunities</option>
+                      <option value="workflow">Workflow Improvements</option>
+                      <option value="specialized">Specialized Use Cases</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <button id="generateIdeasBtn" class="button is-primary is-fullwidth">
+                <span class="icon"><i class="fas fa-lightbulb"></i></span>
+                <span>Generate Micro-SaaS Ideas</span>
+              </button>
             </div>
             <!-- Result container -->
             <div id="ideasResult" class="box mb-4 is-hidden"></div>
+            <!-- Navigation buttons -->
+            <div class="buttons is-centered mt-6">
+              <button class="button is-outlined step-back-btn" data-step="4">
+                <span class="icon"><i class="fas fa-arrow-left"></i></span>
+                <span>Previous Step</span>
+              </button>
+              <button class="button is-success step-forward-btn" data-step="results">
+                <span>View Final Results</span><span class="icon"><i class="fas fa-check-circle"></i></span>
+              </button>
+            </div>
           </div>
           
           <!-- Results (Final summary) -->
           <div class="step-content is-hidden" id="resultsContent">
             <h3 class="subtitle is-4">Analysis Results</h3>
-            <div id="microSaasIdeasInfo" class="box mb-4">
+            <div class="notification is-primary is-light mb-4">
+              <p><strong>Analysis Complete!</strong> Below are the micro-SaaS ideas generated based on your analysis.</p>
+            </div>
+            
+            <div id="microSaasIdeasInfo" class="mb-4">
               <!-- Micro-SaaS ideas will be displayed here -->
             </div>
+            
+            <div class="columns is-multiline mt-6">
+              <div class="column is-12">
+                <div class="box">
+                  <h4 class="title is-5">Analysis Summary</h4>
+                  <div class="content" id="analysisSummary">
+                    <!-- Summary of the entire analysis process -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            
             <div class="buttons">
               <button id="saveResultsBtn" class="button is-success is-fullwidth">
                 <span class="icon"><i class="fas fa-save"></i></span>
                 <span>Save Analysis Results</span>
               </button>
-              <a href="/saas-analyzer/" class="button is-outlined is-primary is-fullwidth">
+              <a href="{% url 'analyze_saas' %}" class="button is-outlined is-primary is-fullwidth">
                 <span class="icon"><i class="fas fa-redo"></i></span>
                 <span>Start New Analysis</span>
               </a>
@@ -182,12 +341,34 @@
           
           <!-- Processing Indicator -->
           <div id="processingIndicator" class="has-text-centered is-hidden">
-            <span class="icon is-large">
-              <i class="fas fa-spinner fa-pulse fa-2x"></i>
-            </span>
-            <p class="mt-4">Processing your request. This may take a moment...</p>
+            <div class="box p-6">
+              <span class="icon is-large mb-4">
+                <i class="fas fa-spinner fa-pulse fa-2x"></i>
+              </span>
+              <p id="processingMessage" class="mt-4">Processing your request. This may take a moment...</p>
+              <progress class="progress is-primary mt-4" max="100"></progress>
+            </div>
           </div>
         </div>
+        
+        <!-- Help section -->
+        <div class="mt-6 pt-5 border-top">
+          <details>
+            <summary class="has-text-weight-medium">Need help with this analysis?</summary>
+            <div class="content mt-2 is-small">
+              <p>This tool helps you analyze existing SaaS products and generate micro-SaaS ideas:</p>
+              <ol>
+                <li><strong>Analyze Target:</strong> Provide details about the main SaaS you want to analyze</li>
+                <li><strong>Identify Competitors:</strong> Discover major competitors in the market</li>
+                <li><strong>Pain Points:</strong> Identify common user frustrations and limitations</li>
+                <li><strong>Market Gaps:</strong> Discover underserved needs and opportunities</li>
+                <li><strong>Micro-SaaS Ideas:</strong> Generate potential micro-SaaS product concepts</li>
+              </ol>
+              <p>Each step builds upon the previous one for a comprehensive analysis.</p>
+            </div>
+          </details>
+        </div>
+        
       </div><!-- end card-content -->
     </div><!-- end card -->
   </div><!-- end container -->

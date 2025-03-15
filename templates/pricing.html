@@ -1,19 +1,18 @@
-
 {% extends 'base.html' %}
 
 {% block title %}Pricing | {% endblock title %}
 
-{% block description %}Simple token based prcing that, no  monotonous monthy subscription, pay for what you use{% endblock description %}
+{% block description %}Try free for 30 days, then just $14.99/month. Early birds get it for only $9.99/month!{% endblock description %}
 {% load static %}
 
 {% block meta %}
 <!-- meta seo -->
     <meta property="og:title" content="Pricing | Microsaaslink">
-    <meta property="og:description" content="Simple token based prcing that, no  monotonous monthy subscription, pay for what you use">
+    <meta property="og:description" content="Try free for 30 days, then just $14.99/month. Early birds get it for only $9.99/month!">
     <meta property="og:image" content="{% static 'app/images/microsaaslink.png' %}">
     
-    <meta name="twitter:title" content=" Pricing | Microsaaslink">
-    <meta name="twitter:description" content="Simple token based prcing that, no  monotonous monthy subscription, pay for what you use">
+    <meta name="twitter:title" content="Pricing | Microsaaslink">
+    <meta name="twitter:description" content="Try free for 30 days, then just $14.99/month. Early birds get it for only $9.99/month!">
     <meta name="twitter:image" content="{% static 'app/images/microsaaslink.png' %}">
     
 {% endblock meta %}
@@ -110,44 +109,86 @@
 
     .section-title {
       font-size: 2.5rem;
-      margin-bottom: 3rem;
+      margin-bottom: 1rem;
       text-align: center;
       background: var(--text-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+    
     .pricing-amount .title {
-    color: #4F46E5;
-  }
+      color: #4F46E5;
+    }
 
-  .feature-card ul {
-    list-style: none !important;
-    margin-left: 0 !important;
-  }
+    .feature-card ul {
+      list-style: none !important;
+      margin-left: 0 !important;
+    }
 
-  .feature-card ul li {
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-  }
+    .feature-card ul li {
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+    }
 
-  .feature-card ul li .icon {
-    margin-right: 0.5rem;
-  }
+    .feature-card ul li .icon {
+      margin-right: 0.5rem;
+    }
 
-  .pricing-amount {
-    position: relative;
-  }
+    .pricing-amount {
+      position: relative;
+    }
 
-  .pricing-amount .title {
-    margin-bottom: 0 !important;
-  }
+    .pricing-amount .title {
+      margin-bottom: 0 !important;
+    }
 
-  .pricing-amount .subtitle {
-    opacity: 0.8;
-  }
+    .pricing-amount .subtitle {
+      opacity: 0.8;
+    }
 
-    footer, nav{ display: none !important; }
+    .promotional-banner {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .yearly-savings {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+    
+    .early-bird {
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      background: #ef4444;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-weight: 600;
+      transform: rotate(15deg);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .countdown {
+      background: rgba(0, 0, 0, 0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      display: inline-block;
+      margin-top: 0.5rem;
+      font-weight: 600;
+    }
+    
+    {% comment %} footer, nav{ display: none !important; } {% endcomment %}
   </style>
 {% endblock custom_styles %}
 
@@ -187,114 +228,106 @@
 
 <section class="section" id="pricing">
   <div class="container">
-    <h2 class="section-title">Simple Token-Based Pricing</h2>
-    <p class="has-text-centered is-size-5 mb-6">Pay only for the analyses you need - no monthly commitments</p>
+    <div class="promotional-banner">
+      <h2 class="is-size-4 mb-2">🎉 Limited Time Offer: Completely Free to Use! 🎉</h2>
+      <p class="is-size-6">No subscription needed during our launch period. Try all premium features at no cost.</p>
+      <div class="countdown">Early Bird Pricing Ends In: 7 Days</div>
+    </div>
+    
+    <h2 class="section-title">Simple, Transparent Pricing</h2>
+    <p class="has-text-centered is-size-5 mb-6">Start with our 30-day free trial, then choose what works for you</p>
 
     <div class="columns is-centered">
-      <!-- Starter Pack -->
-      <div class="column">
+      <!-- Free Trial -->
+      <div class="column is-5">
         <div class="feature-card has-text-centered">
-          <h3 class="title is-3 mb-2">Starter Pack</h3>
+          <h3 class="title is-3 mb-2">Free Trial</h3>
           <div class="pricing-amount mb-4">
-            <p class="title is-1">$19</p>
-            <p class="subtitle is-5 has-text-primary">10 Analysis Tokens</p>
+            <p class="title is-1">$0</p>
+            <p class="subtitle is-5 has-text-primary">For 30 Days</p>
           </div>
           <div class="content mb-5">
             <ul class="has-text-left">
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> 17 - 30 searches per analysis for better upto date resluts</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Full access to all features</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> 17-30 searches per analysis</li>
               <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Multi-platform insights</li>
               <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Technical feasibility reports</li>
               <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Competitor analysis</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 60 days</li>
-            </ul>
-          </div>
-          <a href="{% url 'dashboard' %}" class="button is-primary is-rounded is-outlined is-fullwidth">Buy Now</a>
-        </div>
-      </div>
-
-      <!-- Growth Pack -->
-      <div class="column">
-        <div class="feature-card has-text-centered" style="border: 2px solid #4F46E5;">
-          <div class="tag is-primary is-light mb-4">Most Popular</div>
-          <h3 class="title is-3 mb-2">Pro Pack</h3>
-          <div class="pricing-amount mb-4">
-            <p class="title is-1">$39</p>
-            <p class="subtitle is-5 has-text-primary">24 Analysis Tokens</p>
-            <p class="subtitle is-5 has-text-link">Save 37% vs Starter</p>
-          </div>
-          <div class="content mb-5">
-            <ul class="has-text-left">
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> All Starter features</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Priority processing</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Extended data retention</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Trend forecasting</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 6 months</li>
-            </ul>
-          </div>
-          <a href="{% url 'dashboard' %}" class="button is-primary is-rounded is-fullwidth">Buy Now</a>
-        </div>
-      </div>
-
-      <!-- Trial Pack -->
-      <div class="column">
-        <div class="feature-card has-text-centered">
-          <h3 class="title is-3 mb-2">Trial Pack</h3>
-          <div class="pricing-amount mb-4">
-            <p class="title is-1">$0</p>
-            <p class="subtitle is-5 has-text-primary">2 Analysis Tokens</p>
-          </div>
-          <div class="content mb-5">
-            <ul class="has-text-left">
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Full analysis capabilities</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Community support</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Basic market insights</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Technical snapshot</li>
-              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Tokens valid for 14 days</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> No credit card required</li>
             </ul>
           </div>
           <a href="{% url 'dashboard' %}" class="button is-primary is-rounded is-outlined is-fullwidth">Start Free Trial</a>
         </div>
       </div>
+
+      <!-- Premium Subscription -->
+      <div class="column is-5">
+        <div class="feature-card has-text-centered" style="border: 2px solid #4F46E5; position: relative;">
+          <div class="early-bird">Early Bird!</div>
+          <h3 class="title is-3 mb-2">Premium</h3>
+          <div class="pricing-amount mb-4">
+            <p class="title is-1">$14.99</p>
+            <p class="subtitle is-5 has-text-primary">per month</p>
+            <p class="tag is-warning is-large mt-2 mb-2">Early Bird Price: $9.99/mo</p>
+            <div class="yearly-savings">Save 16% with annual billing</div>
+          </div>
+          <div class="content mb-5">
+            <ul class="has-text-left">
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Everything in Free Trial</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Unlimited analyses</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Priority processing</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Extended data retention</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Trend forecasting</li>
+              <li><span class="icon has-text-primary"><i class="fas fa-check"></i></span> Email reports & alerts</li>
+            </ul>
+          </div>
+          <div class="buttons are-medium is-centered">
+            <a href="{% url 'dashboard' %}" class="button is-primary is-rounded">Subscribe Monthly</a>
+            <a href="{% url 'dashboard' %}" class="button is-link is-rounded">Subscribe Yearly</a>
+          </div>
+        </div>
+      </div>
     </div>
+    
     <!-- FAQ Section -->
     <div class="mt-6 pt-6">
       <h3 class="title is-4 has-text-centered mb-5">Frequently Asked Questions</h3>
       <div class="columns is-multiline is-centered">
         <div class="column is-6">
           <div class="content">
-            <h4 class="is-size-5 mb-3">What's included in one analysis?</h4>
-            <p>Each analysis combines targeted searches across platforms like GitHub, G2, and LinkedIn, plus comprehensive AI-powered insights.</p>
+            <h4 class="is-size-5 mb-3">What's included in the free trial?</h4>
+            <p>You get full access to all premium features for 30 days. No credit card required and no obligation to continue.</p>
           </div>
         </div>
         <div class="column is-6">
           <div class="content">
-            <h4 class="is-size-5 mb-3">Can I share tokens with my team?</h4>
-            <p>Yes! Tokens are pooled at the account level and can be used by any team member with access.</p>
+            <h4 class="is-size-5 mb-3">How does the early bird pricing work?</h4>
+            <p>Sign up during our launch period to lock in the special rate of $9.99/month for as long as you maintain your subscription.</p>
           </div>
         </div>
 
         <div class="column is-6">
           <div class="content">
-            <h4 class="is-size-5 mb-3">What is an analysis token?</h4>
-            <p>Each token allows you to perform one complete SaaS analysis, including market research, pain point identification, and opportunity recommendations.</p>
+            <h4 class="is-size-5 mb-3">Can I cancel anytime?</h4>
+            <p>Yes! There are no long-term contracts. You can cancel your subscription at any time without penalty.</p>
           </div>
         </div>
         <div class="column is-6">
           <div class="content">
-            <h4 class="is-size-5 mb-3">How long are tokens valid?</h4>
-            <p>Tokens validity varies by package - theyre clearly stated on each packages. Unused tokens expire after their validity period.</p>
+            <h4 class="is-size-5 mb-3">What happens after my free trial?</h4>
+            <p>After 30 days, you'll be prompted to choose a subscription plan. No automatic charges - we'll ask for your permission first.</p>
           </div>
         </div>
         <div class="column is-6">
           <div class="content">
-            <h4 class="is-size-5 mb-3">Can I buy more tokens later?</h4>
-            <p>Yes! You can purchase additional token packs at any time. Tokens from different packs maintain their respective features and validity periods.</p>
+            <h4 class="is-size-5 mb-3">How does yearly billing work?</h4>
+            <p>With yearly billing, you pay for 10 months and get 2 months free - that's a 16% savings compared to monthly billing.</p>
           </div>
         </div>
         <div class="column is-6">
           <div class="content">
-            <h4 class="is-size-5 mb-3">What happens if I need more features?</h4>
-            <p>You can upgrade to a higher tier token pack at any time. The new tokens will include all features of the higher tier package.</p>
+            <h4 class="is-size-5 mb-3">Will my price increase later?</h4>
+            <p>Early bird subscribers lock in their special rate for as long as they maintain their subscription, even after the promotion ends.</p>
           </div>
         </div>
       </div>
