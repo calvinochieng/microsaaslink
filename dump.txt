@@ -442,3 +442,202 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>
 
+
+
+# views.py
+from django.shortcuts import render
+from django.views.generic import TemplateView
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
+
+# Static Pages
+def home(request):
+    return render(request, 'home/index.html', {
+        'featured_opportunities': get_featured_opportunities(),  # Your custom logic
+        'testimonials': Testimonial.objects.all()  # If you have a model
+    })
+
+def pricing(request):
+    return render(request, 'home/pricing.html', {
+        'pricing_tiers': [
+            {'name': 'Basic', 'price': 49},
+            {'name': 'Pro', 'price': 99},
+            {'name': 'Enterprise', 'price': 299}
+        ]
+    })
+
+def about(request):
+    return render(request, 'home/about.html')
+
+def blog(request):
+    # If you have a Blog model:
+    # posts = BlogPost.objects.filter(published=True).order_by('-created_at')
+    return render(request, 'home/blog.html', {
+        # 'posts': posts
+    })
+
+# Legal Pages
+def terms_of_service(request):
+    return render(request, 'legal/terms.html')
+
+def privacy_policy(request):
+    return render(request, 'legal/privacy.html')
+
+def refund_policy(request):
+    return render(request, 'legal/refund.html')
+
+# Support Views
+def contact(request):
+    if request.method == 'POST':
+        # Process contact form
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        
+        send_mail(
+            f"Contact Form Submission from {name}",
+            message,
+            email,
+            [settings.DEFAULT_FROM_EMAIL],
+            fail_silently=False,
+        )
+        messages.success(request, "Your message has been sent!")
+        return redirect('contact')
+    
+    return render(request, 'support/contact.html')
+
+def faq(request):
+    faq_categories = {
+        'General': [
+            {'question': 'How does it work?', 'answer': '...'},
+            # ... more questions
+        ],
+        'Billing': [
+            # ... billing questions
+        ]
+    }
+    return render(request, 'support/faq.html', {'faq_categories': faq_categories})
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MicroSaaSLink - Terms of Service</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <style>
+        .section { padding: 3rem 1.5rem; }
+        .content { max-width: 800px; margin: 0 auto; }
+        .toc-list { position: sticky; top: 20px; }
+        .highlight { background-color: #f5f5f5; padding: 1.5rem; border-radius: 6px; }
+        h2 { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; }
+        h3 { margin-top: 1.5rem; }
+    </style>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <div class="content">
+                <h1 class="title is-2">Terms of Service</h1>
+                <p class="subtitle is-6">Last Updated: March 16, 2025</p>
+
+                <div class="box has-background-light toc-list">
+                    <h2 class="title is-5">Table of Contents</h2>
+                    <ul>
+                        <li><a href="#introduction">1. Introduction</a></li>
+                        <li><a href="#definitions">2. Definitions</a></li>
+                        <li><a href="#account-registration">3. Account Registration</a></li>
+                        <li><a href="#subscription">4. Subscription and Payment</a></li>
+                        <li><a href="#refund">5. Refund Policy</a></li>
+                        <li><a href="#usage">6. Service Usage and Limitations</a></li>
+                        <li><a href="#content">7. User Content</a></li>
+                        <li><a href="#warranties">8. Disclaimer of Warranties</a></li>
+                        <li><a href="#liability">9. Limitation of Liability</a></li>
+                        <li><a href="#indemnification">10. Indemnification</a></li>
+                        <li><a href="#privacy">11. Data Privacy</a></li>
+                        <li><a href="#termination">12. Termination</a></li>
+                        <li><a href="#modifications">13. Modifications</a></li>
+                        <li><a href="#law">14. Governing Law</a></li>
+                        <li><a href="#contact">15. Contact Us</a></li>
+                        <li><a href="#agreement">16. Entire Agreement</a></li>
+                        <li><a href="#severability">17. Severability</a></li>
+                        <li><a href="#waiver">18. Waiver</a></li>
+                        <li><a href="#assignment">19. Assignment</a></li>
+                        <li><a href="#force-majeure">20. Force Majeure</a></li>
+                    </ul>
+                </div>
+
+                <!-- Section 1 -->
+                <section id="introduction">
+                    <h2 class="title is-4">1. Introduction</h2>
+                    <p>Welcome to MicroSaaSLink ("we," "our," "us," "the Company," or "MicroSaaSLink"). These Terms of Service ("Terms") govern your access to and use of our website at microsaasl.ink and all related services (collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, please do not access or use the Service.</p>
+                    <p>MicroSaaSLink is a platform that helps users identify potential micro-SaaS opportunities by analyzing user feedback from existing SaaS products to find pain points that can be transformed into solutions.</p>
+                </section>
+
+                <!-- Section 2 -->
+                <section id="definitions">
+                    <h2 class="title is-4">2. Definitions</h2>
+                    <ul>
+                        <li><strong>"User," "You," or "Your"</strong> refers to any individual or entity that accesses or uses the Service.</li>
+                        <li><strong>"Content"</strong> refers to all information, data, text, software, music, sound, photographs, graphics, videos, messages, or other materials that users submit, post, or display on or through the Service.</li>
+                        <li><strong>"micro-SaaS Ideas"</strong> refers to the business opportunities and concepts generated by our platform based on analysis of existing SaaS products.</li>
+                    </ul>
+                </section>
+
+                <!-- Section 3 -->
+                <section id="account-registration">
+                    <h2 class="title is-4">3. Account Registration</h2>
+                    
+                    <h3 class="subtitle is-5">3.1 Account Creation</h3>
+                    <p>To access certain features of the Service, you must register for an account. You may register directly by providing your username, full name, and email address, or through your Google account. When you register through a social login option, we collect the same information as with manual signup.</p>
+                    
+                    <h3 class="subtitle is-5">3.2 Account Responsibility</h3>
+                    <p>You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
+                    
+                    <h3 class="subtitle is-5">3.3 Account Restrictions</h3>
+                    <p>Each individual is entitled to one account only. Account sharing is strictly prohibited. We reserve the right to terminate any accounts that we reasonably believe are being shared among multiple users.</p>
+                </section>
+
+                <!-- Section 4 -->
+                <section id="subscription">
+                    <h2 class="title is-4">4. Subscription and Payment</h2>
+                    
+                    <h3 class="subtitle is-5">4.1 Subscription Options</h3>
+                    <p>We offer subscription plans that may be billed on a monthly or annual basis. Annual subscriptions may be offered at a discount compared to monthly billing.</p>
+                    
+                    <h3 class="subtitle is-5">4.2 Payment Processing</h3>
+                    <p>All payments are processed securely through our payment processor, Paddle. By subscribing to our Service, you authorize us to charge the payment method you provide for the subscription plan you choose.</p>
+                    
+                    <h3 class="subtitle is-5">4.3 Subscription Renewal</h3>
+                    <p>Subscriptions automatically renew at the end of each billing period unless canceled before the renewal date. You may cancel your subscription at any time through your account settings.</p>
+                    
+                    <h3 class="subtitle is-5">4.4 Price Changes</h3>
+                    <p>We reserve the right to adjust pricing for our services at any time. If we change pricing, we will provide notice of the change on our website or by email at least 14 days before the change takes effect.</p>
+                </section>
+
+                <!-- Section 5 -->
+                <section id="refund">
+                    <h2 class="title is-4">5. Refund Policy</h2>
+                    
+                    <h3 class="subtitle is-5">5.1 Eligibility for Refunds</h3>
+                    <p>Refunds may be requested only if you have not generated any micro-SaaS ideas using our Service. Once you have used the Service to generate ideas, no refunds will be issued.</p>
+                    
+                    <h3 class="subtitle is-5">5.2 Refund Process</h3>
+                    <p>For complete details on our refund policy, please visit <a href="https://microsaasl.ink/refund/" class="has-text-link">https://microsaasl.ink/refund/</a>. All refund requests must be submitted according to the procedures outlined in that policy.</p>
+                </section>
+
+                <!-- Continue adding all remaining sections following the same pattern -->
+
+                <!-- Section 20 -->
+                <section id="force-majeure">
+                    <h2 class="title is-4">20. Force Majeure</h2>
+                    <p>We will not be liable for any failure or delay in performance resulting from causes beyond our reasonable control, including but not limited to acts of God, natural disasters, pandemic, war, terrorism, riots, civil unrest, government action, labor disputes, or internet service provider failures.</p>
+                </section>
+            </div>
+        </div>
+    </section>
+
+</body>
+</html>
+

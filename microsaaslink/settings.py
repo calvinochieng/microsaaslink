@@ -176,7 +176,7 @@ else:
         }
     }
     # print("databases", DATABASES)
-print(config('DB_PASSWORD'))
+
 
 
 AUTH_PASSWORD_VALIDATORS = [
