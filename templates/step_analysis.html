@@ -82,6 +82,9 @@
   }
   
   /* Card styling */
+  .custom-box{
+    border: 1px solid #dddddd4f; margin-bottom: 1rem; box-shadow: 0 0 0 rgba(0, 0, 0, 0); !important
+  }
   .card {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease;
@@ -98,11 +101,16 @@
   }
   
   /* Result container styling */
+  .has-border-bottom{
+    border-bottom: 1px solid #ddd;
+  }
   .result-container {
-    background-color: #f8f9fa;
+    
     border-radius: 6px;
     padding: 1.25rem;
     margin-top: 1rem;
+    border: 1px solid #ddd;
+
     border-left: 4px solid #00d1b2;
   }
   
@@ -212,11 +220,11 @@
               </button>
             </div>
             <!-- Result container -->
-            <div id="competitorsResult" class="box mb-4 is-hidden"></div>
+            <div id="competitorsResult" class=" mb-4 is-hidden"></div>
           </div>
           
           <!-- Step 3: Analyze Pain Points -->
-          <div class="step-content is-hidden" id="step3Content">
+          <div class="step-content mb-4 is-hidden" id="step3Content">
             <h3 class="subtitle is-4">Step 3: Analyze Competitor Pain Points</h3>
             <p class="mb-4">Identify pain points and limitations in existing solutions.</p>
             <!-- Action container -->
@@ -227,11 +235,11 @@
               </button>
             </div>
             <!-- Result container -->
-            <div id="painPointsResult" class="box mb-4 is-hidden"></div>
+            <div id="painPointsResult" class=" mb-4 is-hidden"></div>
           </div>
           
           <!-- Step 4: Identify Market Gaps -->
-          <div class="step-content is-hidden" id="step4Content">
+          <div class="step-content mb-4 is-hidden" id="step4Content">
             <h3 class="subtitle is-4">Step 4: Identify Market Gaps</h3>
             <p class="mb-4">Discover opportunities and underserved needs in the market.</p>
             <!-- Action container -->
@@ -242,7 +250,7 @@
               </button>
             </div>
             <!-- Result container -->
-            <div id="marketGapsResult" class="box mb-4 is-hidden"></div>
+            <div id="marketGapsResult" class="mb-4 is-hidden"></div>
             <!-- Navigation buttons -->
             <div class="buttons is-centered mt-6">
               <button class="button is-outlined step-back-btn" data-step="3">
@@ -272,7 +280,7 @@
                 </div>
                 <p class="help">How many unique micro-SaaS ideas would you like to generate?</p>
               </div>
-              <div class="field">
+              {% comment %} <div class="field">
                 <label class="label">Focus Area</label>
                 <div class="control">
                   <div class="select is-fullwidth">
@@ -285,14 +293,14 @@
                     </select>
                   </div>
                 </div>
-              </div>
+              </div> {% endcomment %}
               <button id="generateIdeasBtn" class="button is-primary is-fullwidth">
                 <span class="icon"><i class="fas fa-lightbulb"></i></span>
                 <span>Generate Micro-SaaS Ideas</span>
               </button>
             </div>
             <!-- Result container -->
-            <div id="ideasResult" class="box mb-4 is-hidden"></div>
+            <div id="ideasResult" class="mb-4 is-hidden"></div>
             <!-- Navigation buttons -->
             <div class="buttons is-centered mt-6">
               <button class="button is-outlined step-back-btn" data-step="4">
@@ -451,14 +459,14 @@
           const infoHtml = `
             <div>
               <h4 class="title is-5">${targetInfo.name}</h4>
-              <p><strong>URL:</strong> ${targetInfo.url || 'N/A'}</p>
-              <p><strong>Description:</strong> ${targetInfo.description}</p>
-              <p><strong>Target Audience:</strong> ${targetInfo.target_audience.join(', ')}</p>
-              <p><strong>Differential Factor:</strong> ${targetInfo.differential_factor}</p>
+              <p class="mb-3"><strong>URL:</strong> ${targetInfo.url || 'N/A'}</p>
+              <p class="mb-3"><strong>Description:</strong> ${targetInfo.description}</p>
+              <p class="mb-3"><strong>Target Audience:</strong> ${targetInfo.target_audience.join(', ')}</p>
+              <p class="mb-3"><strong>Differential Factor:</strong> ${targetInfo.differential_factor}</p>
               <div class="mt-4">
-                <h5 class="subtitle is-6">Pain Points:</h5>
+                <h5 class="subtitle has-text-weight-bold is-6">Pain Points:</h5>
                 <ul>
-                  ${targetInfo.pain_points.map(p => `<li>${p.issue} <span class="tag">${p.severity}/10</span></li>`).join('')}
+                  ${targetInfo.pain_points.map(p => `<li  class="mb-2">➡${p.issue} <span class="tag is-warning">${p.severity}/10</span></li>`).join('')}
                 </ul>
               </div>
             </div>
@@ -504,7 +512,7 @@
           let competitorsHtml = '<h4 class="title is-5">Identified Competitors</h4>';
           competitors.forEach((comp, index) => {
             competitorsHtml += `
-              <div class="content ${index < competitors.length - 1 ? 'has-border-bottom' : ''}">
+              <div class="content pb-4 ${index < competitors.length - 1 ? 'has-border-bottom' : ''}">
                 <h5 class="subtitle is-6">${comp.name}</h5>
                 <p><strong>URL:</strong> ${comp.url || 'N/A'}</p>
                 <p><strong>Description:</strong> ${comp.description}</p>
@@ -550,23 +558,23 @@
         if (data.status === 'success') {
           let painPointsHtml = '<h4 class="title is-5">Common Pain Points</h4><div>';
           for (const competitorName in data.result) {
-            painPointsHtml += `<div class="box">
-              <h5 class="subtitle is-6">${competitorName}</h5>`;
+            painPointsHtml += `<div class="">
+              <h5 class="title is-6 has-text-weight-bold has-background-black-ter p-3">${competitorName}</h5>`;
             const painPointsArray = data.result[competitorName];
             if (Array.isArray(painPointsArray)) {
               painPointsArray.forEach(point => {
                 painPointsHtml += `
-                  <div class="box">
-                    <div class="level">
-                      <div class="level-left">
-                        <div class="level-item"><strong>${point.issue}</strong></div>
+                  <div class="box custom-box">
+                    <div class="">
+                      <div class="">
+                        <div class="level-item subtitle is-6"><strong>${point.issue}</strong></div>
                       </div>
                       <div class="level-right">
                         <div class="level-item"><span class="tag is-info">Frequency: ${point.frequency}</span></div>
                       </div>
                     </div>
                     <p>Addressed: ${point.being_addressed}</p>
-                    <p><strong>Severity:</strong> <span class="tag">${point.severity}/10</span></p>
+                    <p><strong>Severity:</strong> <span class="tag is-warning">${point.severity}/10</span></p>
                   </div>
                 `;
               });
@@ -618,8 +626,8 @@
           if (Array.isArray(patterns)) {
             patterns.forEach((pattern, index) => {
               patternsHtml += `
-                <div class="box">
-                  <h5 class="subtitle is-6">Pattern #${index + 1}: ${pattern.category}</h5>
+                <div class="mb-4 has-border-bottom pb-4">
+                  <h5 class="subtitle is-6 has-text-weight-bold">Pattern #${index + 1}: ${pattern.category}</h5>
                   <p>${pattern.description}</p>
                   <p><strong>Examples:</strong> ${(pattern.examples || []).join(', ')}</p>
                   <p><strong>Prevalence:</strong> ${pattern.prevalence}</p>
@@ -635,8 +643,8 @@
           if (Array.isArray(marketGaps)) {
             marketGaps.forEach((gap, index) => {
               gapsHtml += `
-                <div class="box">
-                  <h5 class="subtitle is-6">Gap #${index + 1}: ${gap.gap}</h5>
+                <div class="mb-4 has-border-bottom pb-4">
+                  <h5 class="subtitle is-6 has-text-weight-bold">Gap #${index + 1}: ${gap.gap}</h5>
                   <span class="tag is-warning">Severity: ${gap.severity}/10</span>
                   <p><strong>Opportunity Size:</strong> ${gap.opportunity_size}</p>
                   <p><strong>Explanation:</strong> ${gap.explanation}</p>
@@ -689,25 +697,25 @@
           let ideasHtml = '<h4 class="title is-5">Generated Micro-SaaS Ideas</h4><div>';
           ideas.forEach((idea, index) => {
             ideasHtml += `
-              <div class="card">
+              <div class="has-border-bottom mb-4">
                 <div class="card-content">
                   <h5 class="title is-6 has-text-success">Idea #${index + 1}: ${idea.name}</h5>
-                  <p><strong>Description:</strong> ${idea.description}</p>
-                  <p><strong>Target Audience:</strong> ${idea.target_audience}</p>
-                  <div>
+                  <p class="mb-3"><strong>Description:</strong> ${idea.description}</p>
+                  <p class="mb-3"><strong>Target Audience:</strong> ${idea.target_audience}</p>
+                  <div class="mb-3">
                     <p><strong>Key Features:</strong></p>
                     <ul>
                       ${idea.key_features.map(feature => `<li>${feature}</li>`).join('')}
                     </ul>
                   </div>
-                  <div>
+                  <div class="mb-3">
                     <p><strong>Pricing Model:</strong> ${idea.pricing_model}</p>
                   </div>
-                  <div>
+                  <div class="mb-3">
                     <p><strong>Validation:</strong> ${idea.validation}</p>
                   </div>
-                  <div>
-                    <span class="tag">Implementation Difficulty: ${idea.implementation_difficulty}/10</span>
+                  <div class="mb-3">
+                    <span class="tag is-warning">Implementation Difficulty: ${idea.implementation_difficulty}/10</span>
                   </div>
                 </div>
               </div>
